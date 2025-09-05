@@ -245,11 +245,44 @@ class Command(BaseCommand):
                 alumnos = {}
                 for alumno_data in alumnos_data:
                     carrera_codigo = alumno_data['carrera']
-                    alumno_data['carrera'] = carreras[carrera_codigo]
-                    print(alumno_data['username'])
-                    alumno, created = Alumno.objects.get_or_create(
+                    carrera = carreras[carrera_codigo]
+                    
+                    # Crear primero el usuario
+                    usuario_data = {
+                        'username': alumno_data['username'],
+                        'email': alumno_data['email'],
+                        'first_name': alumno_data['nombre'],
+                        'last_name': alumno_data['apellido'],
+                        'rol': 'alumno',
+                        'is_active': True,
+                    }
+                    
+                    usuario, user_created = Usuario.objects.get_or_create(
                         username=alumno_data['username'],
-                        defaults=alumno_data
+                        defaults=usuario_data
+                    )
+                    
+                    if user_created:
+                        usuario.set_password(alumno_data['username'])  # DNI como contraseña
+                        usuario.save()
+                    
+                    # Ahora crear el alumno
+                    alumno_final_data = {
+                        'nombre': alumno_data['nombre'],
+                        'apellido': alumno_data['apellido'],
+                        'email': alumno_data['email'],
+                        'telefono': alumno_data['telefono'],
+                        'fecha_nacimiento': alumno_data['fecha_nacimiento'],
+                        'legajo': alumno_data['legajo'],
+                        'carrera': carrera,
+                        'usuario': usuario,
+                        'año_ingreso': alumno_data['año_ingreso'],
+                        'username': alumno_data['username'],
+                    }
+                    
+                    alumno, created = Alumno.objects.get_or_create(
+                        legajo=alumno_data['legajo'],
+                        defaults=alumno_final_data
                     )
                     alumnos[alumno_data['username']] = alumno
                     if created:
