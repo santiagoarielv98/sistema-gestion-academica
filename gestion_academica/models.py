@@ -16,12 +16,15 @@ class Persona(models.Model):
     de todas las personas en el sistema.
     Aplica el principio de herencia de POO.
     """
-    dni = models.CharField(
+    username = models.CharField(
         max_length=8, 
         unique=True, 
         validators=[RegexValidator(regex=r'^\d{8}$', message='El DNI debe tener 8 dígitos')],
-        verbose_name='DNI'
+        verbose_name='DNI',
+        db_column='dni'
     )
+    # def get_dni(self):
+    #     return self.username
     nombre = models.CharField(max_length=100, verbose_name='Nombre')
     apellido = models.CharField(max_length=100, verbose_name='Apellido')
     email = models.EmailField(unique=True, verbose_name='Correo Electrónico')
@@ -39,7 +42,7 @@ class Persona(models.Model):
         abstract = True  # Clase abstracta - no crea tabla en BD
 
     def __str__(self):
-        return f"{self.nombre} {self.apellido} (DNI: {self.dni})"
+        return f"{self.nombre} {self.apellido} (DNI: {self.username})"
 
     @property
     def nombre_completo(self):
@@ -61,19 +64,20 @@ class Usuario(AbstractUser):
     ]
     
     # Usamos email como username
-    username = None
+    
     email = models.EmailField(unique=True, verbose_name='Correo Electrónico')
-    dni = models.CharField(
+    username = models.CharField(
         max_length=8, 
         unique=True,
         validators=[RegexValidator(regex=r'^\d{8}$', message='El DNI debe tener 8 dígitos')],
-        verbose_name='DNI'
+        verbose_name='DNI',
+        db_column='dni'
     )
     rol = models.CharField(max_length=20, choices=ROLES, verbose_name='Rol')
     primer_login = models.BooleanField(default=True, verbose_name='Primer Login')
     
     USERNAME_FIELD = 'email'
-    REQUIRED_FIELDS = ['dni', 'first_name', 'last_name', 'rol']
+    REQUIRED_FIELDS = ['username', 'first_name', 'last_name', 'rol']
 
     class Meta:
         verbose_name = 'Usuario'
@@ -88,7 +92,7 @@ class Usuario(AbstractUser):
         """
         if not self.pk and not self.password:
             # Contraseña inicial es el DNI
-            self.set_password(self.dni)
+            self.set_password(self.username)
         super().save(*args, **kwargs)
 
 
@@ -247,7 +251,7 @@ class Alumno(Persona):
         super().clean()
         # Si tiene usuario, validar que los datos coincidan
         if self.usuario:
-            if self.usuario.dni != self.dni:
+            if self.usuario.username != self.username:
                 raise ValidationError('El DNI del usuario debe coincidir con el del alumno')
             if self.usuario.email != self.email:
                 raise ValidationError('El email del usuario debe coincidir con el del alumno')
@@ -262,7 +266,7 @@ class Alumno(Persona):
         if not self.usuario:
             usuario = Usuario.objects.create_user(
                 email=self.email,
-                dni=self.dni,
+                username=self.username,
                 first_name=self.nombre,
                 last_name=self.apellido,
                 rol='alumno'

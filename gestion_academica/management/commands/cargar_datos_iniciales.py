@@ -36,7 +36,7 @@ class Command(BaseCommand):
                 admin_user, created = Usuario.objects.get_or_create(
                     email='admin@crui.edu.ar',
                     defaults={
-                        'dni': '12345678',
+                        'username': '12345678',
                         'first_name': 'Administrador',
                         'last_name': 'Sistema',
                         'rol': 'administrador',
@@ -54,7 +54,7 @@ class Command(BaseCommand):
                 invitado_user, created = Usuario.objects.get_or_create(
                     email='invitado@ejemplo.com',
                     defaults={
-                        'dni': '87654321',
+                        'username': '87654321',
                         'first_name': 'Usuario',
                         'last_name': 'Invitado',
                         'rol': 'invitado',
@@ -197,7 +197,7 @@ class Command(BaseCommand):
                 # Crear alumnos de ejemplo
                 alumnos_data = [
                     {
-                        'dni': '20123456',
+                        'username': '20123456',
                         'nombre': 'Juan Carlos',
                         'apellido': 'González',
                         'email': 'juan.gonzalez@estudiante.crui.edu.ar',
@@ -208,7 +208,7 @@ class Command(BaseCommand):
                         'año_ingreso': 2024
                     },
                     {
-                        'dni': '20234567',
+                        'username': '20234567',
                         'nombre': 'María Elena',
                         'apellido': 'Rodríguez',
                         'email': 'maria.rodriguez@estudiante.crui.edu.ar',
@@ -219,7 +219,7 @@ class Command(BaseCommand):
                         'año_ingreso': 2024
                     },
                     {
-                        'dni': '20345678',
+                        'username': '20345678',
                         'nombre': 'Carlos Alberto',
                         'apellido': 'Fernández',
                         'email': 'carlos.fernandez@estudiante.crui.edu.ar',
@@ -230,7 +230,7 @@ class Command(BaseCommand):
                         'año_ingreso': 2024
                     },
                     {
-                        'dni': '20456789',
+                        'username': '20456789',
                         'nombre': 'Ana Sofía',
                         'apellido': 'López',
                         'email': 'ana.lopez@estudiante.crui.edu.ar',
@@ -246,15 +246,15 @@ class Command(BaseCommand):
                 for alumno_data in alumnos_data:
                     carrera_codigo = alumno_data['carrera']
                     alumno_data['carrera'] = carreras[carrera_codigo]
-                    
+                    print(alumno_data['username'])
                     alumno, created = Alumno.objects.get_or_create(
-                        dni=alumno_data['dni'],
+                        username=alumno_data['username'],
                         defaults=alumno_data
                     )
-                    alumnos[alumno_data['dni']] = alumno
+                    alumnos[alumno_data['username']] = alumno
                     if created:
                         self.stdout.write(f'✓ Alumno creado: {alumno.nombre_completo}')
-
+                print("después del for")
                 # Crear algunas inscripciones de ejemplo
                 inscripciones_data = [
                     # Juan González (Programación) - 1er año

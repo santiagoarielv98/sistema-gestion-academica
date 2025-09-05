@@ -108,10 +108,10 @@ class UsuarioForm(forms.ModelForm):
 
     class Meta:
         model = Usuario
-        fields = ['email', 'dni', 'first_name', 'last_name', 'rol', 'password']
+        fields = ['email', 'username', 'first_name', 'last_name', 'rol', 'password']
         labels = {
             'email': 'Correo Electrónico',
-            'dni': 'DNI',
+            'username': 'DNI',
             'first_name': 'Nombre',
             'last_name': 'Apellido',
             'rol': 'Rol',
@@ -293,10 +293,10 @@ class AlumnoForm(forms.ModelForm):
     """
     class Meta:
         model = Alumno
-        fields = ['dni', 'nombre', 'apellido', 'email', 'telefono', 'fecha_nacimiento', 
+        fields = ['nombre', 'apellido', 'email', 'telefono', 'fecha_nacimiento', 
                  'legajo', 'carrera', 'año_ingreso']
         labels = {
-            'dni': 'DNI',
+            'username': 'DNI',
             'nombre': 'Nombre',
             'apellido': 'Apellido',
             'email': 'Correo Electrónico',
@@ -307,7 +307,7 @@ class AlumnoForm(forms.ModelForm):
             'año_ingreso': 'Año de Ingreso',
         }
         widgets = {
-            'dni': forms.TextInput(attrs={'placeholder': '12345678', 'maxlength': '8'}),
+            'username': forms.TextInput(attrs={'placeholder': '12345678', 'maxlength': '8'}),
             'nombre': forms.TextInput(attrs={'placeholder': 'Nombre'}),
             'apellido': forms.TextInput(attrs={'placeholder': 'Apellido'}),
             'email': forms.EmailInput(attrs={'placeholder': 'correo@ejemplo.com'}),
