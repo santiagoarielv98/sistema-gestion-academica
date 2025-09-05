@@ -23,6 +23,5 @@ def redirect_to_dashboard(request):
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('', redirect_to_dashboard, name='home'),
     path('', include('gestion_academica.urls')),
 ]
