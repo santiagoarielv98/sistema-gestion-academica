@@ -1,0 +1,65 @@
+{% extends 'gestion_academica/base.html' %}
+
+{% block title %}Alumnos - Sistema Académico{% endblock %}
+
+{% block content %}
+<h1>Gestión de Alumnos</h1>
+
+<p><a href="{% url 'gestion_academica:alumno_create' %}">Crear Nuevo Alumno</a></p>
+
+{% if alumnos %}
+    <table border="1">
+        <thead>
+            <tr>
+                <th>Legajo</th>
+                <th>Nombre Completo</th>
+                <th>DNI</th>
+                <th>Email</th>
+                <th>Carrera</th>
+                <th>Año Ingreso</th>
+                <th>Estado</th>
+                <th>Acciones</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for alumno in alumnos %}
+            <tr>
+                <td>{{ alumno.legajo }}</td>
+                <td>{{ alumno.nombre_completo }}</td>
+                <td>{{ alumno.dni }}</td>
+                <td>{{ alumno.email }}</td>
+                <td>{{ alumno.carrera.nombre }}</td>
+                <td>{{ alumno.año_ingreso }}</td>
+                <td>{% if alumno.activo %}Activo{% else %}Inactivo{% endif %}</td>
+                <td>
+                    <a href="{% url 'gestion_academica:alumno_update' alumno.pk %}">Editar</a> |
+                    <a href="{% url 'gestion_academica:alumno_delete' alumno.pk %}">Eliminar</a>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    
+    {% if is_paginated %}
+        <div>
+            <span>
+                {% if page_obj.has_previous %}
+                    <a href="?page=1">« primera</a>
+                    <a href="?page={{ page_obj.previous_page_number }}">anterior</a>
+                {% endif %}
+                
+                <span>
+                    Página {{ page_obj.number }} de {{ page_obj.paginator.num_pages }}
+                </span>
+                
+                {% if page_obj.has_next %}
+                    <a href="?page={{ page_obj.next_page_number }}">siguiente</a>
+                    <a href="?page={{ page_obj.paginator.num_pages }}">última »</a>
+                {% endif %}
+            </span>
+        </div>
+    {% endif %}
+{% else %}
+    <p>No hay alumnos registrados en el sistema.</p>
+{% endif %}
+{% endblock %}

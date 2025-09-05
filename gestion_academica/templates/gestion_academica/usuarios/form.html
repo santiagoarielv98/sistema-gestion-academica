@@ -1,0 +1,114 @@
+{% extends 'gestion_academica/base.html' %}
+
+{% block title %}
+    {% if object %}Editar Usuario{% else %}Nuevo Usuario{% endif %} - Sistema Académico
+{% endblock %}
+
+{% block content %}
+<h1>{% if object %}Editar Usuario{% else %}Nuevo Usuario{% endif %}</h1>
+
+<form method="post">
+    {% csrf_token %}
+    
+    <div>
+        <label for="{{ form.email.id_for_label }}">{{ form.email.label }}</label>
+        {{ form.email }}
+        {% if form.email.errors %}
+            <ul>
+                {% for error in form.email.errors %}
+                    <li>{{ error }}</li>
+                {% endfor %}
+            </ul>
+        {% endif %}
+    </div>
+    
+    <div>
+        <label for="{{ form.dni.id_for_label }}">{{ form.dni.label }}</label>
+        {{ form.dni }}
+        {% if form.dni.errors %}
+            <ul>
+                {% for error in form.dni.errors %}
+                    <li>{{ error }}</li>
+                {% endfor %}
+            </ul>
+        {% endif %}
+    </div>
+    
+    <div>
+        <label for="{{ form.first_name.id_for_label }}">{{ form.first_name.label }}</label>
+        {{ form.first_name }}
+        {% if form.first_name.errors %}
+            <ul>
+                {% for error in form.first_name.errors %}
+                    <li>{{ error }}</li>
+                {% endfor %}
+            </ul>
+        {% endif %}
+    </div>
+    
+    <div>
+        <label for="{{ form.last_name.id_for_label }}">{{ form.last_name.label }}</label>
+        {{ form.last_name }}
+        {% if form.last_name.errors %}
+            <ul>
+                {% for error in form.last_name.errors %}
+                    <li>{{ error }}</li>
+                {% endfor %}
+            </ul>
+        {% endif %}
+    </div>
+    
+    <div>
+        <label for="{{ form.rol.id_for_label }}">{{ form.rol.label }}</label>
+        {{ form.rol }}
+        {% if form.rol.errors %}
+            <ul>
+                {% for error in form.rol.errors %}
+                    <li>{{ error }}</li>
+                {% endfor %}
+            </ul>
+        {% endif %}
+    </div>
+    
+    <div>
+        <label for="{{ form.password.id_for_label }}">{{ form.password.label }}</label>
+        {{ form.password }}
+        {% if form.password.errors %}
+            <ul>
+                {% for error in form.password.errors %}
+                    <li>{{ error }}</li>
+                {% endfor %}
+            </ul>
+        {% endif %}
+        {% if form.password.help_text %}
+            <small>{{ form.password.help_text }}</small>
+        {% endif %}
+    </div>
+    
+    {% if form.non_field_errors %}
+        <div>
+            {% for error in form.non_field_errors %}
+                <p><strong>Error:</strong> {{ error }}</p>
+            {% endfor %}
+        </div>
+    {% endif %}
+    
+    <button type="submit">{% if object %}Actualizar{% else %}Crear{% endif %} Usuario</button>
+    <a href="{% url 'gestion_academica:usuario_list' %}">Cancelar</a>
+</form>
+
+<hr>
+<h3>Información sobre Roles</h3>
+<ul>
+    <li><strong>Administrador:</strong> Acceso completo al sistema</li>
+    <li><strong>Alumno:</strong> Puede ver sus materias e inscribirse</li>
+    <li><strong>Invitado:</strong> Solo puede consultar la oferta académica</li>
+    <li><strong>Docente:</strong> Funcionalidad futura</li>
+    <li><strong>Preceptor:</strong> Funcionalidad futura</li>
+</ul>
+
+{% if not object %}
+<h3>Contraseña Inicial</h3>
+<p>Si no se especifica una contraseña, se usará el DNI como contraseña inicial. El usuario deberá cambiarla en su primer acceso.</p>
+{% endif %}
+{% endblock %}

@@ -1,0 +1,90 @@
+{% extends 'gestion_academica/base.html' %}
+
+{% block title %}Dashboard - Sistema Académico{% endblock %}
+
+{% block content %}
+<h1>Dashboard del Sistema Académico</h1>
+
+<p>Bienvenido al sistema de gestión académica. Desde aquí puedes acceder a todas las funcionalidades según tu rol.</p>
+
+{% if user.is_authenticated %}
+    <h2>¡Hola, {{ user.get_full_name|default:user.email }}!</h2>
+    <p>Tu rol: <strong>{{ user.get_rol_display }}</strong></p>
+
+    {% if user.rol == 'administrador' %}
+        <h3>Panel de Administrador</h3>
+        <ul>
+            <li><a href="{% url 'gestion_academica:carreras_list' %}">Gestionar Carreras</a></li>
+            <li><a href="{% url 'gestion_academica:materias_list' %}">Gestionar Materias</a></li>
+            <li><a href="{% url 'gestion_academica:alumnos_list' %}">Gestionar Alumnos</a></li>
+            <li><a href="{% url 'gestion_academica:usuarios_list' %}">Gestionar Usuarios</a></li>
+            <li><a href="{% url 'gestion_academica:inscripciones_list' %}">Gestionar Inscripciones</a></li>
+        </ul>
+        
+        <h4>Consultas y Reportes</h4>
+        <ul>
+            <li><a href="{% url 'gestion_academica:consultas_carrera' %}">Consultas por Carrera</a></li>
+            <li><a href="{% url 'gestion_academica:consultas_materia' %}">Consultas por Materia</a></li>
+            <li><a href="{% url 'gestion_academica:materias_con_cupo' %}">Materias con Cupo Disponible</a></li>
+        </ul>
+
+    {% elif user.rol == 'alumno' %}
+        <h3>Panel de Alumno</h3>
+        <ul>
+            <li><a href="{% url 'gestion_academica:mis_materias' %}">Mis Materias</a></li>
+            <li><a href="{% url 'gestion_academica:oferta_academica' %}">Oferta Académica</a></li>
+            <li><a href="{% url 'gestion_academica:cambiar_password' %}">Cambiar Contraseña</a></li>
+        </ul>
+        
+        <h4>Información Pública</h4>
+        <ul>
+            <li><a href="{% url 'gestion_academica:carreras_publicas' %}">Ver Carreras</a></li>
+            <li><a href="{% url 'gestion_academica:materias_publicas' %}">Ver Materias</a></li>
+            <li><a href="{% url 'gestion_academica:materias_con_cupo' %}">Materias con Cupo</a></li>
+        </ul>
+    {% endif %}
+
+    <hr>
+    <p><a href="{% url 'gestion_academica:logout' %}">Cerrar Sesión</a></p>
+
+{% else %}
+    <h3>Información Pública</h3>
+    <p>Como invitado, puedes consultar información general sobre nuestra oferta académica:</p>
+    
+    <ul>
+        <li><a href="{% url 'gestion_academica:carreras_publicas' %}">Carreras Disponibles</a></li>
+        <li><a href="{% url 'gestion_academica:materias_publicas' %}">Materias Disponibles</a></li>
+        <li><a href="{% url 'gestion_academica:materias_con_cupo' %}">Materias con Cupo Disponible</a></li>
+        <li><a href="{% url 'gestion_academica:consultas_carrera' %}">Consultas por Carrera</a></li>
+        <li><a href="{% url 'gestion_academica:consultas_materia' %}">Consultas por Materia</a></li>
+    </ul>
+
+    <hr>
+    <p>¿Eres estudiante o administrador? <a href="{% url 'gestion_academica:login' %}">Inicia Sesión</a></p>
+{% endif %}
+
+<hr>
+<h3>Estadísticas Generales</h3>
+<table border="1">
+    <tr>
+        <th>Total de Carreras</th>
+        <td>{{ stats.total_carreras }}</td>
+    </tr>
+    <tr>
+        <th>Total de Materias</th>
+        <td>{{ stats.total_materias }}</td>
+    </tr>
+    <tr>
+        <th>Total de Alumnos</th>
+        <td>{{ stats.total_alumnos }}</td>
+    </tr>
+    <tr>
+        <th>Total de Inscripciones</th>
+        <td>{{ stats.total_inscripciones }}</td>
+    </tr>
+    <tr>
+        <th>Materias con Cupo Disponible</th>
+        <td>{{ stats.materias_con_cupo }}</td>
+    </tr>
+</table>
+{% endblock %}

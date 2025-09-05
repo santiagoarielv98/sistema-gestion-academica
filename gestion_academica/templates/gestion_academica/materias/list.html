@@ -1,0 +1,77 @@
+{% extends 'gestion_academica/base.html' %}
+
+{% block title %}Materias - Sistema Académico{% endblock %}
+
+{% block content %}
+<h1>Gestión de Materias</h1>
+
+<p><a href="{% url 'gestion_academica:materia_create' %}">Crear Nueva Materia</a></p>
+
+<!-- Filtro por carrera -->
+<form method="get">
+    <div>
+        <label for="{{ filtro_form.carrera.id_for_label }}">{{ filtro_form.carrera.label }}</label>
+        {{ filtro_form.carrera }}
+        <button type="submit">Filtrar</button>
+        <a href="{% url 'gestion_academica:materia_list' %}">Limpiar Filtro</a>
+    </div>
+</form>
+
+{% if materias %}
+    <table border="1">
+        <thead>
+            <tr>
+                <th>Nombre</th>
+                <th>Código</th>
+                <th>Carrera</th>
+                <th>Año</th>
+                <th>Cuatrimestre</th>
+                <th>Cupo Máximo</th>
+                <th>Cupo Disponible</th>
+                <th>Estado</th>
+                <th>Acciones</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for materia in materias %}
+            <tr>
+                <td>{{ materia.nombre }}</td>
+                <td>{{ materia.codigo }}</td>
+                <td>{{ materia.carrera.nombre }}</td>
+                <td>{{ materia.año }}°</td>
+                <td>{{ materia.get_cuatrimestre_display }}</td>
+                <td>{{ materia.cupo_maximo }}</td>
+                <td>{{ materia.cupo_disponible }}</td>
+                <td>{% if materia.activa %}Activa{% else %}Inactiva{% endif %}</td>
+                <td>
+                    <a href="{% url 'gestion_academica:materia_update' materia.pk %}">Editar</a> |
+                    <a href="{% url 'gestion_academica:materia_delete' materia.pk %}">Eliminar</a>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    
+    {% if is_paginated %}
+        <div>
+            <span>
+                {% if page_obj.has_previous %}
+                    <a href="?page=1{% if request.GET.carrera %}&carrera={{ request.GET.carrera }}{% endif %}">« primera</a>
+                    <a href="?page={{ page_obj.previous_page_number }}{% if request.GET.carrera %}&carrera={{ request.GET.carrera }}{% endif %}">anterior</a>
+                {% endif %}
+                
+                <span>
+                    Página {{ page_obj.number }} de {{ page_obj.paginator.num_pages }}
+                </span>
+                
+                {% if page_obj.has_next %}
+                    <a href="?page={{ page_obj.next_page_number }}{% if request.GET.carrera %}&carrera={{ request.GET.carrera }}{% endif %}">siguiente</a>
+                    <a href="?page={{ page_obj.paginator.num_pages }}{% if request.GET.carrera %}&carrera={{ request.GET.carrera }}{% endif %}">última »</a>
+                {% endif %}
+            </span>
+        </div>
+    {% endif %}
+{% else %}
+    <p>No hay materias registradas en el sistema{% if request.GET.carrera %} para la carrera seleccionada{% endif %}.</p>
+{% endif %}
+{% endblock %}

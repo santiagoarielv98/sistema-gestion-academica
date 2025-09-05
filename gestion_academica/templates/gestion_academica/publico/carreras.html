@@ -1,0 +1,36 @@
+{% extends 'gestion_academica/base.html' %}
+
+{% block title %}Carreras Disponibles - Sistema Académico{% endblock %}
+
+{% block content %}
+<h1>Carreras Disponibles</h1>
+
+<p>Aquí puedes consultar todas las carreras disponibles en nuestra institución.</p>
+
+{% if carreras %}
+    <div>
+        {% for carrera in carreras %}
+            <div style="border: 1px solid #ccc; margin: 10px 0; padding: 15px;">
+                <h3>{{ carrera.nombre }}</h3>
+                <p><strong>Código:</strong> {{ carrera.codigo }}</p>
+                <p><strong>Duración:</strong> {{ carrera.duracion_años }} años</p>
+                {% if carrera.descripcion %}
+                    <p><strong>Descripción:</strong> {{ carrera.descripcion }}</p>
+                {% endif %}
+                <p><strong>Estado:</strong> {% if carrera.activa %}Activa{% else %}No disponible{% endif %}</p>
+                
+                <p><a href="{% url 'gestion_academica:materias_publicas' %}?carrera={{ carrera.id }}">Ver Materias de esta Carrera</a></p>
+            </div>
+        {% endfor %}
+    </div>
+{% else %}
+    <p>No hay carreras disponibles actualmente.</p>
+{% endif %}
+
+<hr>
+<h3>Más Información</h3>
+<ul>
+    <li><a href="{% url 'gestion_academica:materias_publicas' %}">Ver Todas las Materias</a></li>
+    <li><a href="{% url 'gestion_academica:materias_por_carrera' %}">Consultas por Carrera</a></li>
+</ul>
+{% endblock %}

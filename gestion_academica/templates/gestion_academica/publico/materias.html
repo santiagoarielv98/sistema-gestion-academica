@@ -1,0 +1,57 @@
+{% extends 'gestion_academica/base.html' %}
+
+{% block title %}Materias Disponibles - Sistema Académico{% endblock %}
+
+{% block content %}
+<h1>Materias Disponibles</h1>
+
+<p>Aquí puedes consultar todas las materias disponibles, organizadas por carrera.</p>
+
+<!-- Filtro por carrera -->
+<form method="get">
+    <div>
+        <label for="{{ filtro_form.carrera.id_for_label }}">{{ filtro_form.carrera.label }}</label>
+        {{ filtro_form.carrera }}
+        <button type="submit">Filtrar</button>
+        <a href="{% url 'gestion_academica:materias_publicas' %}">Ver Todas</a>
+    </div>
+</form>
+
+{% if materias %}
+    <table border="1">
+        <thead>
+            <tr>
+                <th>Materia</th>
+                <th>Código</th>
+                <th>Carrera</th>
+                <th>Año</th>
+                <th>Cuatrimestre</th>
+                <th>Cupo Máximo</th>
+                <th>Descripción</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for materia in materias %}
+            <tr>
+                <td>{{ materia.nombre }}</td>
+                <td>{{ materia.codigo }}</td>
+                <td>{{ materia.carrera.nombre }}</td>
+                <td>{{ materia.año }}°</td>
+                <td>{{ materia.get_cuatrimestre_display }}</td>
+                <td>{{ materia.cupo_maximo }}</td>
+                <td>{{ materia.descripcion|default:"Sin descripción" }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+{% else %}
+    <p>No hay materias disponibles{% if request.GET.carrera %} para la carrera seleccionada{% endif %}.</p>
+{% endif %}
+
+<hr>
+<h3>Enlaces Relacionados</h3>
+<ul>
+    <li><a href="{% url 'gestion_academica:carreras_publicas' %}">Ver Carreras Disponibles</a></li>
+    <li><a href="{% url 'gestion_academica:materias_con_cupo' %}">Ver Materias con Cupo Disponible</a></li>
+</ul>
+{% endblock %}

@@ -1,0 +1,111 @@
+{% extends 'gestion_academica/base.html' %}
+
+{% block title %}Consultas por Carrera - Sistema Académico{% endblock %}
+
+{% block content %}
+<h1>Consultas por Carrera</h1>
+
+<p>Selecciona una carrera para ver las materias correspondientes y estadísticas de inscripción.</p>
+
+<!-- Filtro de carrera -->
+<form method="get">
+    <div>
+        <label for="{{ filtro_form.carrera.id_for_label }}">{{ filtro_form.carrera.label }}</label>
+        {{ filtro_form.carrera }}
+        <button type="submit">Consultar</button>
+    </div>
+</form>
+
+{% if carrera_seleccionada %}
+    <h2>{{ carrera_seleccionada.nombre }}</h2>
+    
+    <h3>Información de la Carrera</h3>
+    <table border="1">
+        <tr>
+            <th>Código</th>
+            <td>{{ carrera_seleccionada.codigo }}</td>
+        </tr>
+        <tr>
+            <th>Duración</th>
+            <td>{{ carrera_seleccionada.duracion_años }} años</td>
+        </tr>
+        <tr>
+            <th>Descripción</th>
+            <td>{{ carrera_seleccionada.descripcion|default:"Sin descripción" }}</td>
+        </tr>
+        <tr>
+            <th>Total de Materias</th>
+            <td>{{ materias_carrera|length }}</td>
+        </tr>
+        <tr>
+            <th>Total de Alumnos Inscritos</th>
+            <td>{{ total_alumnos_inscritos }}</td>
+        </tr>
+    </table>
+
+    <h3>Materias de la Carrera</h3>
+    {% if materias_carrera %}
+        <table border="1">
+            <thead>
+                <tr>
+                    <th>Materia</th>
+                    <th>Código</th>
+                    <th>Año</th>
+                    <th>Cuatrimestre</th>
+                    <th>Cupo Máximo</th>
+                    <th>Inscriptos</th>
+                    <th>Cupo Disponible</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for materia in materias_carrera %}
+                <tr>
+                    <td>{{ materia.nombre }}</td>
+                    <td>{{ materia.codigo }}</td>
+                    <td>{{ materia.año }}°</td>
+                    <td>{{ materia.get_cuatrimestre_display }}</td>
+                    <td>{{ materia.cupo_maximo }}</td>
+                    <td>{{ materia.inscriptos_actuales }}</td>
+                    <td>{{ materia.cupo_disponible }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    {% else %}
+        <p>No hay materias registradas para esta carrera.</p>
+    {% endif %}
+
+    <h3>Estadísticas por Año</h3>
+    {% if estadisticas_por_año %}
+        <table border="1">
+            <thead>
+                <tr>
+                    <th>Año</th>
+                    <th>Materias</th>
+                    <th>Total Inscripciones</th>
+                    <th>Promedio por Materia</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for año, stats in estadisticas_por_año.items %}
+                <tr>
+                    <td>{{ año }}°</td>
+                    <td>{{ stats.materias }}</td>
+                    <td>{{ stats.inscripciones }}</td>
+                    <td>{{ stats.promedio|floatformat:1 }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    {% endif %}
+
+{% endif %}
+
+<hr>
+<h3>Enlaces Relacionados</h3>
+<ul>
+    <li><a href="{% url 'gestion_academica:consultas_materia' %}">Consultas por Materia</a></li>
+    <li><a href="{% url 'gestion_academica:carreras_publicas' %}">Ver Todas las Carreras</a></li>
+    <li><a href="{% url 'gestion_academica:materias_publicas' %}">Ver Todas las Materias</a></li>
+</ul>
+{% endblock %}

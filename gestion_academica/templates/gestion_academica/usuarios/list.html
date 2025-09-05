@@ -1,0 +1,63 @@
+{% extends 'gestion_academica/base.html' %}
+
+{% block title %}Usuarios - Sistema Académico{% endblock %}
+
+{% block content %}
+<h1>Gestión de Usuarios</h1>
+
+<p><a href="{% url 'gestion_academica:usuario_create' %}">Crear Nuevo Usuario</a></p>
+
+{% if usuarios %}
+    <table border="1">
+        <thead>
+            <tr>
+                <th>Nombre Completo</th>
+                <th>DNI</th>
+                <th>Email</th>
+                <th>Rol</th>
+                <th>Primer Login</th>
+                <th>Estado</th>
+                <th>Acciones</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for usuario in usuarios %}
+            <tr>
+                <td>{{ usuario.get_full_name }}</td>
+                <td>{{ usuario.dni }}</td>
+                <td>{{ usuario.email }}</td>
+                <td>{{ usuario.get_rol_display }}</td>
+                <td>{% if usuario.primer_login %}Pendiente{% else %}Completado{% endif %}</td>
+                <td>{% if usuario.is_active %}Activo{% else %}Inactivo{% endif %}</td>
+                <td>
+                    <a href="{% url 'gestion_academica:usuario_update' usuario.pk %}">Editar</a> |
+                    <a href="{% url 'gestion_academica:usuario_delete' usuario.pk %}">Eliminar</a>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    
+    {% if is_paginated %}
+        <div>
+            <span>
+                {% if page_obj.has_previous %}
+                    <a href="?page=1">« primera</a>
+                    <a href="?page={{ page_obj.previous_page_number }}">anterior</a>
+                {% endif %}
+                
+                <span>
+                    Página {{ page_obj.number }} de {{ page_obj.paginator.num_pages }}
+                </span>
+                
+                {% if page_obj.has_next %}
+                    <a href="?page={{ page_obj.next_page_number }}">siguiente</a>
+                    <a href="?page={{ page_obj.paginator.num_pages }}">última »</a>
+                {% endif %}
+            </span>
+        </div>
+    {% endif %}
+{% else %}
+    <p>No hay usuarios registrados en el sistema.</p>
+{% endif %}
+{% endblock %}

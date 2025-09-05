@@ -1,0 +1,29 @@
+{% extends 'gestion_academica/base.html' %}
+
+{% block title %}Eliminar Alumno - Sistema Académico{% endblock %}
+
+{% block content %}
+<h1>Eliminar Alumno</h1>
+
+<p><strong>¿Estás seguro de que deseas eliminar al alumno "{{ object.nombre_completo }}"?</strong></p>
+
+<div>
+    <h3>Información del Alumno:</h3>
+    <ul>
+        <li><strong>Legajo:</strong> {{ object.legajo }}</li>
+        <li><strong>Nombre:</strong> {{ object.nombre_completo }}</li>
+        <li><strong>DNI:</strong> {{ object.dni }}</li>
+        <li><strong>Email:</strong> {{ object.email }}</li>
+        <li><strong>Carrera:</strong> {{ object.carrera.nombre }}</li>
+        <li><strong>Año de Ingreso:</strong> {{ object.año_ingreso }}</li>
+    </ul>
+</div>
+
+<p><strong>Advertencia:</strong> Esta acción no se puede deshacer. También se eliminará el usuario asociado si existe.</p>
+
+<form method="post">
+    {% csrf_token %}
+    <button type="submit">Sí, Eliminar Alumno</button>
+    <a href="{% url 'gestion_academica:alumno_list' %}">Cancelar</a>
+</form>
+{% endblock %}

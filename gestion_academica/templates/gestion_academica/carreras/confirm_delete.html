@@ -1,0 +1,27 @@
+{% extends 'gestion_academica/base.html' %}
+
+{% block title %}Eliminar Carrera - Sistema Académico{% endblock %}
+
+{% block content %}
+<h1>Eliminar Carrera</h1>
+
+<p><strong>¿Estás seguro de que deseas eliminar la carrera "{{ object.nombre }}"?</strong></p>
+
+<div>
+    <h3>Información de la Carrera:</h3>
+    <ul>
+        <li><strong>Nombre:</strong> {{ object.nombre }}</li>
+        <li><strong>Código:</strong> {{ object.codigo }}</li>
+        <li><strong>Duración:</strong> {{ object.duracion_años }} años</li>
+        <li><strong>Descripción:</strong> {{ object.descripcion|default:"Sin descripción" }}</li>
+    </ul>
+</div>
+
+<p><strong>Advertencia:</strong> Esta acción no se puede deshacer. No podrás eliminar la carrera si tiene materias o alumnos asociados.</p>
+
+<form method="post">
+    {% csrf_token %}
+    <button type="submit">Sí, Eliminar Carrera</button>
+    <a href="{% url 'gestion_academica:carrera_list' %}">Cancelar</a>
+</form>
+{% endblock %}

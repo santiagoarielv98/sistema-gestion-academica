@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Sistema de Gestión Académica{% endblock %}</title>
+</head>
+<body>
+    <header>
+        <nav>
+            <h1><a href="{% url 'gestion_academica:dashboard' %}">Sistema Académico</a></h1>
+            
+            {% if user.is_authenticated %}
+            <ul>
+                <li><a href="{% url 'gestion_academica:dashboard' %}">Inicio</a></li>
+                
+                {% if user.rol == 'administrador' %}
+                    <li><a href="{% url 'gestion_academica:carrera_list' %}">Carreras</a></li>
+                    <li><a href="{% url 'gestion_academica:materia_list' %}">Materias</a></li>
+                    <li><a href="{% url 'gestion_academica:alumno_list' %}">Alumnos</a></li>
+                    <li><a href="{% url 'gestion_academica:usuario_list' %}">Usuarios</a></li>
+                    <li><a href="{% url 'gestion_academica:inscripcion_list' %}">Inscripciones</a></li>
+                    <li><a href="{% url 'gestion_academica:reportes' %}">Reportes</a></li>
+                {% elif user.rol == 'alumno' %}
+                    <li><a href="{% url 'gestion_academica:mis_materias' %}">Mis Materias</a></li>
+                    <li><a href="{% url 'gestion_academica:oferta_academica' %}">Oferta Académica</a></li>
+                {% endif %}
+                
+                {% if user.rol == 'invitado' or user.rol == 'alumno' %}
+                    <li><a href="{% url 'gestion_academica:carreras_publicas' %}">Ver Carreras</a></li>
+                    <li><a href="{% url 'gestion_academica:materias_publicas' %}">Ver Materias</a></li>
+                {% endif %}
+                
+                <li><a href="{% url 'gestion_academica:materias_por_carrera' %}">Consultas</a></li>
+            </ul>
+            
+            <div>
+                <span>{{ user.first_name }} {{ user.last_name }} ({{ user.get_rol_display }})</span>
+                <a href="{% url 'gestion_academica:logout' %}">Cerrar Sesión</a>
+            </div>
+            {% endif %}
+        </nav>
+    </header>
+
+    <main>
+        {% if messages %}
+            <div>
+                {% for message in messages %}
+                    <p><strong>{{ message.tags|title }}:</strong> {{ message }}</p>
+                {% endfor %}
+            </div>
+        {% endif %}
+        
+        {% block content %}
+        {% endblock %}
+    </main>
+
+    <footer>
+        <p>&copy; 2024 Sistema de Gestión Académica - Centro Regional Universitario Ituzaingó</p>
+    </footer>
+</body>
+</html>

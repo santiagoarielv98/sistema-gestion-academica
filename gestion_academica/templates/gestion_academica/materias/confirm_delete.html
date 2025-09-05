@@ -1,0 +1,30 @@
+{% extends 'gestion_academica/base.html' %}
+
+{% block title %}Eliminar Materia - Sistema Académico{% endblock %}
+
+{% block content %}
+<h1>Eliminar Materia</h1>
+
+<p><strong>¿Estás seguro de que deseas eliminar la materia "{{ object.nombre }}"?</strong></p>
+
+<div>
+    <h3>Información de la Materia:</h3>
+    <ul>
+        <li><strong>Nombre:</strong> {{ object.nombre }}</li>
+        <li><strong>Código:</strong> {{ object.codigo }}</li>
+        <li><strong>Carrera:</strong> {{ object.carrera.nombre }}</li>
+        <li><strong>Año:</strong> {{ object.año }}°</li>
+        <li><strong>Cuatrimestre:</strong> {{ object.get_cuatrimestre_display }}</li>
+        <li><strong>Cupo Máximo:</strong> {{ object.cupo_maximo }}</li>
+        <li><strong>Descripción:</strong> {{ object.descripcion|default:"Sin descripción" }}</li>
+    </ul>
+</div>
+
+<p><strong>Advertencia:</strong> Esta acción no se puede deshacer. No podrás eliminar la materia si tiene inscripciones activas.</p>
+
+<form method="post">
+    {% csrf_token %}
+    <button type="submit">Sí, Eliminar Materia</button>
+    <a href="{% url 'gestion_academica:materia_list' %}">Cancelar</a>
+</form>
+{% endblock %}

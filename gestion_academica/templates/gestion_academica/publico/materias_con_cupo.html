@@ -1,0 +1,51 @@
+{% extends 'gestion_academica/base.html' %}
+
+{% block title %}Materias con Cupo Disponible - Sistema Académico{% endblock %}
+
+{% block content %}
+<h1>Materias con Cupo Disponible</h1>
+
+<p>Estas son las materias que actualmente tienen cupo disponible para nuevas inscripciones.</p>
+
+{% if materias_con_cupo %}
+    <table border="1">
+        <thead>
+            <tr>
+                <th>Materia</th>
+                <th>Código</th>
+                <th>Carrera</th>
+                <th>Año</th>
+                <th>Cuatrimestre</th>
+                <th>Inscriptos</th>
+                <th>Cupo Máximo</th>
+                <th>Cupo Disponible</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for materia in materias_con_cupo %}
+            <tr>
+                <td>{{ materia.nombre }}</td>
+                <td>{{ materia.codigo }}</td>
+                <td>{{ materia.carrera.nombre }}</td>
+                <td>{{ materia.año }}°</td>
+                <td>{{ materia.get_cuatrimestre_display }}</td>
+                <td>{{ materia.inscriptos_actuales }}</td>
+                <td>{{ materia.cupo_maximo }}</td>
+                <td>{{ materia.cupo_disponible }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    
+    <p><strong>Total de materias con cupo disponible:</strong> {{ materias_con_cupo|length }}</p>
+{% else %}
+    <p>Actualmente no hay materias con cupo disponible.</p>
+{% endif %}
+
+<hr>
+<h3>Enlaces Relacionados</h3>
+<ul>
+    <li><a href="{% url 'gestion_academica:materias_publicas' %}">Ver Todas las Materias</a></li>
+    <li><a href="{% url 'gestion_academica:carreras_publicas' %}">Ver Carreras Disponibles</a></li>
+</ul>
+{% endblock %}

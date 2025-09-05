@@ -1,0 +1,67 @@
+{% extends 'gestion_academica/base.html' %}
+
+{% block title %}Nueva Inscripción - Sistema Académico{% endblock %}
+
+{% block content %}
+<h1>Nueva Inscripción</h1>
+
+<form method="post">
+    {% csrf_token %}
+    
+    <div>
+        <label for="{{ form.alumno.id_for_label }}">{{ form.alumno.label }}</label>
+        {{ form.alumno }}
+        {% if form.alumno.errors %}
+            <ul>
+                {% for error in form.alumno.errors %}
+                    <li>{{ error }}</li>
+                {% endfor %}
+            </ul>
+        {% endif %}
+    </div>
+    
+    <div>
+        <label for="{{ form.materia.id_for_label }}">{{ form.materia.label }}</label>
+        {{ form.materia }}
+        {% if form.materia.errors %}
+            <ul>
+                {% for error in form.materia.errors %}
+                    <li>{{ error }}</li>
+                {% endfor %}
+            </ul>
+        {% endif %}
+    </div>
+    
+    <div>
+        <label for="{{ form.observaciones.id_for_label }}">{{ form.observaciones.label }}</label>
+        {{ form.observaciones }}
+        {% if form.observaciones.errors %}
+            <ul>
+                {% for error in form.observaciones.errors %}
+                    <li>{{ error }}</li>
+                {% endfor %}
+            </ul>
+        {% endif %}
+    </div>
+    
+    {% if form.non_field_errors %}
+        <div>
+            {% for error in form.non_field_errors %}
+                <p><strong>Error:</strong> {{ error }}</p>
+            {% endfor %}
+        </div>
+    {% endif %}
+    
+    <button type="submit">Crear Inscripción</button>
+    <a href="{% url 'gestion_academica:inscripcion_list' %}">Cancelar</a>
+</form>
+
+<hr>
+<h3>Validaciones Automáticas</h3>
+<p>El sistema validará automáticamente:</p>
+<ul>
+    <li>Que el alumno pertenezca a la misma carrera que la materia</li>
+    <li>Que haya cupo disponible en la materia</li>
+    <li>Que el alumno no esté ya inscripto en la materia</li>
+</ul>
+{% endblock %}

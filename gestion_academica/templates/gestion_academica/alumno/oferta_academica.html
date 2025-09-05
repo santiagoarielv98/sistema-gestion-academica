@@ -1,0 +1,72 @@
+{% extends 'gestion_academica/base.html' %}
+
+{% block title %}Oferta Académica - Sistema Académico{% endblock %}
+
+{% block content %}
+<h1>Oferta Académica</h1>
+
+{% if alumno %}
+    <div>
+        <h2>Mi Carrera: {{ alumno.carrera.nombre }}</h2>
+        <p>Aquí puedes ver todas las materias disponibles en tu carrera e inscribirte a las que tengan cupo.</p>
+    </div>
+
+    {% if materias %}
+        <table border="1">
+            <thead>
+                <tr>
+                    <th>Materia</th>
+                    <th>Código</th>
+                    <th>Año</th>
+                    <th>Cuatrimestre</th>
+                    <th>Cupo Disponible</th>
+                    <th>Descripción</th>
+                    <th>Estado</th>
+                    <th>Acciones</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for materia in materias %}
+                <tr>
+                    <td>{{ materia.nombre }}</td>
+                    <td>{{ materia.codigo }}</td>
+                    <td>{{ materia.año }}°</td>
+                    <td>{{ materia.get_cuatrimestre_display }}</td>
+                    <td>{{ materia.cupo_disponible }} / {{ materia.cupo_maximo }}</td>
+                    <td>{{ materia.descripcion|default:"Sin descripción" }}</td>
+                    <td>
+                        {% if materia.id in materias_inscripto %}
+                            <strong>Ya Inscripto</strong>
+                        {% elif not materia.tiene_cupo %}
+                            <strong>Sin Cupo</strong>
+                        {% else %}
+                            <strong>Disponible</strong>
+                        {% endif %}
+                    </td>
+                    <td>
+                        {% if materia.id not in materias_inscripto and materia.tiene_cupo %}
+                            <form method="post" action="{% url 'gestion_academica:inscribirse' materia.id %}" style="display: inline;">
+                                {% csrf_token %}
+                                <button type="submit" onclick="return confirm('¿Estás seguro de inscribirte a {{ materia.nombre }}?')">Inscribirme</button>
+                            </form>
+                        {% elif materia.id in materias_inscripto %}
+                            <span>Inscripto</span>
+                        {% else %}
+                            <span>No disponible</span>
+                        {% endif %}
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    {% else %}
+        <p>No hay materias disponibles en tu carrera.</p>
+    {% endif %}
+
+    <hr>
+    <p><a href="{% url 'gestion_academica:mis_materias' %}">Ver Mis Materias Actuales</a></p>
+
+{% else %}
+    <p>No se encontró información del alumno. Contacta al administrador.</p>
+{% endif %}
+{% endblock %}

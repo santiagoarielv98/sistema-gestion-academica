@@ -1,0 +1,59 @@
+{% extends 'gestion_academica/base.html' %}
+
+{% block title %}Mis Materias - Sistema Académico{% endblock %}
+
+{% block content %}
+<h1>Mis Materias</h1>
+
+{% if alumno %}
+    <div>
+        <h2>Mi Información</h2>
+        <ul>
+            <li><strong>Legajo:</strong> {{ alumno.legajo }}</li>
+            <li><strong>Carrera:</strong> {{ alumno.carrera.nombre }}</li>
+            <li><strong>Año de Ingreso:</strong> {{ alumno.año_ingreso }}</li>
+        </ul>
+    </div>
+
+    <h2>Materias Inscriptas</h2>
+    {% if inscripciones %}
+        <table border="1">
+            <thead>
+                <tr>
+                    <th>Materia</th>
+                    <th>Código</th>
+                    <th>Año</th>
+                    <th>Cuatrimestre</th>
+                    <th>Fecha Inscripción</th>
+                    <th>Acciones</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for inscripcion in inscripciones %}
+                <tr>
+                    <td>{{ inscripcion.materia.nombre }}</td>
+                    <td>{{ inscripcion.materia.codigo }}</td>
+                    <td>{{ inscripcion.materia.año }}°</td>
+                    <td>{{ inscripcion.materia.get_cuatrimestre_display }}</td>
+                    <td>{{ inscripcion.fecha_inscripcion|date:"d/m/Y" }}</td>
+                    <td>
+                        <form method="post" action="{% url 'gestion_academica:inscripcion_baja' inscripcion.pk %}" style="display: inline;">
+                            {% csrf_token %}
+                            <button type="submit" onclick="return confirm('¿Estás seguro de darte de baja de esta materia?')">Darme de Baja</button>
+                        </form>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    {% else %}
+        <p>No tienes materias inscriptas actualmente.</p>
+    {% endif %}
+
+    <hr>
+    <p><a href="{% url 'gestion_academica:oferta_academica' %}">Ver Oferta Académica e Inscribirme a Más Materias</a></p>
+
+{% else %}
+    <p>No se encontró información del alumno. Contacta al administrador.</p>
+{% endif %}
+{% endblock %}

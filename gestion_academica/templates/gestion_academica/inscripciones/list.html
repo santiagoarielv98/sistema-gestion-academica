@@ -1,0 +1,69 @@
+{% extends 'gestion_academica/base.html' %}
+
+{% block title %}Inscripciones - Sistema Académico{% endblock %}
+
+{% block content %}
+<h1>Gestión de Inscripciones</h1>
+
+<p><a href="{% url 'gestion_academica:inscripcion_create' %}">Crear Nueva Inscripción</a></p>
+
+{% if inscripciones %}
+    <table border="1">
+        <thead>
+            <tr>
+                <th>Alumno</th>
+                <th>Materia</th>
+                <th>Carrera</th>
+                <th>Fecha Inscripción</th>
+                <th>Estado</th>
+                <th>Observaciones</th>
+                <th>Acciones</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for inscripcion in inscripciones %}
+            <tr>
+                <td>{{ inscripcion.alumno.nombre_completo }} ({{ inscripcion.alumno.legajo }})</td>
+                <td>{{ inscripcion.materia.nombre }} ({{ inscripcion.materia.codigo }})</td>
+                <td>{{ inscripcion.materia.carrera.nombre }}</td>
+                <td>{{ inscripcion.fecha_inscripcion|date:"d/m/Y H:i" }}</td>
+                <td>{% if inscripcion.activa %}Activa{% else %}Dada de Baja{% endif %}</td>
+                <td>{{ inscripcion.observaciones|default:"Sin observaciones" }}</td>
+                <td>
+                    {% if inscripcion.activa %}
+                        <form method="post" action="{% url 'gestion_academica:inscripcion_baja' inscripcion.pk %}" style="display: inline;">
+                            {% csrf_token %}
+                            <button type="submit" onclick="return confirm('¿Estás seguro de dar de baja esta inscripción?')">Dar de Baja</button>
+                        </form>
+                    {% else %}
+                        <span>Baja dada</span>
+                    {% endif %}
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    
+    {% if is_paginated %}
+        <div>
+            <span>
+                {% if page_obj.has_previous %}
+                    <a href="?page=1">« primera</a>
+                    <a href="?page={{ page_obj.previous_page_number }}">anterior</a>
+                {% endif %}
+                
+                <span>
+                    Página {{ page_obj.number }} de {{ page_obj.paginator.num_pages }}
+                </span>
+                
+                {% if page_obj.has_next %}
+                    <a href="?page={{ page_obj.next_page_number }}">siguiente</a>
+                    <a href="?page={{ page_obj.paginator.num_pages }}">última »</a>
+                {% endif %}
+            </span>
+        </div>
+    {% endif %}
+{% else %}
+    <p>No hay inscripciones registradas en el sistema.</p>
+{% endif %}
+{% endblock %}

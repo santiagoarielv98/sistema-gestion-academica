@@ -1,0 +1,59 @@
+{% extends 'gestion_academica/base.html' %}
+
+{% block title %}Carreras - Sistema Académico{% endblock %}
+
+{% block content %}
+<h1>Gestión de Carreras</h1>
+
+<p><a href="{% url 'gestion_academica:carrera_create' %}">Crear Nueva Carrera</a></p>
+
+{% if carreras %}
+    <table border="1">
+        <thead>
+            <tr>
+                <th>Nombre</th>
+                <th>Código</th>
+                <th>Duración (años)</th>
+                <th>Estado</th>
+                <th>Acciones</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for carrera in carreras %}
+            <tr>
+                <td>{{ carrera.nombre }}</td>
+                <td>{{ carrera.codigo }}</td>
+                <td>{{ carrera.duracion_años }}</td>
+                <td>{% if carrera.activa %}Activa{% else %}Inactiva{% endif %}</td>
+                <td>
+                    <a href="{% url 'gestion_academica:carrera_update' carrera.pk %}">Editar</a> |
+                    <a href="{% url 'gestion_academica:carrera_delete' carrera.pk %}">Eliminar</a>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    
+    {% if is_paginated %}
+        <div>
+            <span>
+                {% if page_obj.has_previous %}
+                    <a href="?page=1">« primera</a>
+                    <a href="?page={{ page_obj.previous_page_number }}">anterior</a>
+                {% endif %}
+                
+                <span>
+                    Página {{ page_obj.number }} de {{ page_obj.paginator.num_pages }}
+                </span>
+                
+                {% if page_obj.has_next %}
+                    <a href="?page={{ page_obj.next_page_number }}">siguiente</a>
+                    <a href="?page={{ page_obj.paginator.num_pages }}">última »</a>
+                {% endif %}
+            </span>
+        </div>
+    {% endif %}
+{% else %}
+    <p>No hay carreras registradas en el sistema.</p>
+{% endif %}
+{% endblock %}

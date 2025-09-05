@@ -1,0 +1,108 @@
+{% extends 'gestion_academica/base.html' %}
+
+{% block title %}
+    {% if object %}Editar Materia{% else %}Nueva Materia{% endif %} - Sistema Académico
+{% endblock %}
+
+{% block content %}
+<h1>{% if object %}Editar Materia{% else %}Nueva Materia{% endif %}</h1>
+
+<form method="post">
+    {% csrf_token %}
+    
+    <div>
+        <label for="{{ form.nombre.id_for_label }}">{{ form.nombre.label }}</label>
+        {{ form.nombre }}
+        {% if form.nombre.errors %}
+            <ul>
+                {% for error in form.nombre.errors %}
+                    <li>{{ error }}</li>
+                {% endfor %}
+            </ul>
+        {% endif %}
+    </div>
+    
+    <div>
+        <label for="{{ form.codigo.id_for_label }}">{{ form.codigo.label }}</label>
+        {{ form.codigo }}
+        {% if form.codigo.errors %}
+            <ul>
+                {% for error in form.codigo.errors %}
+                    <li>{{ error }}</li>
+                {% endfor %}
+            </ul>
+        {% endif %}
+    </div>
+    
+    <div>
+        <label for="{{ form.carrera.id_for_label }}">{{ form.carrera.label }}</label>
+        {{ form.carrera }}
+        {% if form.carrera.errors %}
+            <ul>
+                {% for error in form.carrera.errors %}
+                    <li>{{ error }}</li>
+                {% endfor %}
+            </ul>
+        {% endif %}
+    </div>
+    
+    <div>
+        <label for="{{ form.año.id_for_label }}">{{ form.año.label }}</label>
+        {{ form.año }}
+        {% if form.año.errors %}
+            <ul>
+                {% for error in form.año.errors %}
+                    <li>{{ error }}</li>
+                {% endfor %}
+            </ul>
+        {% endif %}
+    </div>
+    
+    <div>
+        <label for="{{ form.cuatrimestre.id_for_label }}">{{ form.cuatrimestre.label }}</label>
+        {{ form.cuatrimestre }}
+        {% if form.cuatrimestre.errors %}
+            <ul>
+                {% for error in form.cuatrimestre.errors %}
+                    <li>{{ error }}</li>
+                {% endfor %}
+            </ul>
+        {% endif %}
+    </div>
+    
+    <div>
+        <label for="{{ form.cupo_maximo.id_for_label }}">{{ form.cupo_maximo.label }}</label>
+        {{ form.cupo_maximo }}
+        {% if form.cupo_maximo.errors %}
+            <ul>
+                {% for error in form.cupo_maximo.errors %}
+                    <li>{{ error }}</li>
+                {% endfor %}
+            </ul>
+        {% endif %}
+    </div>
+    
+    <div>
+        <label for="{{ form.descripcion.id_for_label }}">{{ form.descripcion.label }}</label>
+        {{ form.descripcion }}
+        {% if form.descripcion.errors %}
+            <ul>
+                {% for error in form.descripcion.errors %}
+                    <li>{{ error }}</li>
+                {% endfor %}
+            </ul>
+        {% endif %}
+    </div>
+    
+    {% if form.non_field_errors %}
+        <div>
+            {% for error in form.non_field_errors %}
+                <p><strong>Error:</strong> {{ error }}</p>
+            {% endfor %}
+        </div>
+    {% endif %}
+    
+    <button type="submit">{% if object %}Actualizar{% else %}Crear{% endif %} Materia</button>
+    <a href="{% url 'gestion_academica:materia_list' %}">Cancelar</a>
+</form>
+{% endblock %}

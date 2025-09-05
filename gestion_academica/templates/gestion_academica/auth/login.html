@@ -1,0 +1,54 @@
+{% extends 'gestion_academica/base.html' %}
+
+{% block title %}Iniciar Sesión - Sistema Académico{% endblock %}
+
+{% block content %}
+<h1>Iniciar Sesión</h1>
+
+<form method="post">
+    {% csrf_token %}
+    
+    <div>
+        <label for="{{ form.username.id_for_label }}">{{ form.username.label }}</label>
+        {{ form.username }}
+        {% if form.username.errors %}
+            <ul>
+                {% for error in form.username.errors %}
+                    <li>{{ error }}</li>
+                {% endfor %}
+            </ul>
+        {% endif %}
+    </div>
+    
+    <div>
+        <label for="{{ form.password.id_for_label }}">{{ form.password.label }}</label>
+        {{ form.password }}
+        {% if form.password.errors %}
+            <ul>
+                {% for error in form.password.errors %}
+                    <li>{{ error }}</li>
+                {% endfor %}
+            </ul>
+        {% endif %}
+    </div>
+    
+    {% if form.non_field_errors %}
+        <div>
+            {% for error in form.non_field_errors %}
+                <p><strong>Error:</strong> {{ error }}</p>
+            {% endfor %}
+        </div>
+    {% endif %}
+    
+    <button type="submit">Iniciar Sesión</button>
+</form>
+
+<hr>
+<h3>Información del Sistema</h3>
+<p><strong>Usuarios por defecto:</strong></p>
+<ul>
+    <li>Administrador: usar el superusuario creado</li>
+    <li>Alumnos: se crean desde el panel de administrador</li>
+</ul>
+<p><strong>Nota:</strong> La contraseña inicial de todos los usuarios es su DNI. Deberán cambiarla en el primer acceso.</p>
+{% endblock %}

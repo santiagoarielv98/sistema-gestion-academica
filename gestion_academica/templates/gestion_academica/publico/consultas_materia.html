@@ -1,0 +1,95 @@
+{% extends 'gestion_academica/base.html' %}
+
+{% block title %}Consultas por Materia - Sistema Académico{% endblock %}
+
+{% block content %}
+<h1>Consultas por Materia</h1>
+
+<p>Selecciona una materia para ver información detallada y los alumnos inscritos.</p>
+
+<!-- Filtro de materia -->
+<form method="get">
+    <div>
+        <label for="{{ filtro_form.materia.id_for_label }}">{{ filtro_form.materia.label }}</label>
+        {{ filtro_form.materia }}
+        <button type="submit">Consultar</button>
+    </div>
+</form>
+
+{% if materia_seleccionada %}
+    <h2>{{ materia_seleccionada.nombre }} ({{ materia_seleccionada.codigo }})</h2>
+    
+    <h3>Información de la Materia</h3>
+    <table border="1">
+        <tr>
+            <th>Carrera</th>
+            <td>{{ materia_seleccionada.carrera.nombre }}</td>
+        </tr>
+        <tr>
+            <th>Año</th>
+            <td>{{ materia_seleccionada.año }}°</td>
+        </tr>
+        <tr>
+            <th>Cuatrimestre</th>
+            <td>{{ materia_seleccionada.get_cuatrimestre_display }}</td>
+        </tr>
+        <tr>
+            <th>Cupo Máximo</th>
+            <td>{{ materia_seleccionada.cupo_maximo }}</td>
+        </tr>
+        <tr>
+            <th>Inscriptos Actuales</th>
+            <td>{{ materia_seleccionada.inscriptos_actuales }}</td>
+        </tr>
+        <tr>
+            <th>Cupo Disponible</th>
+            <td>{{ materia_seleccionada.cupo_disponible }}</td>
+        </tr>
+        <tr>
+            <th>Descripción</th>
+            <td>{{ materia_seleccionada.descripcion|default:"Sin descripción" }}</td>
+        </tr>
+    </table>
+
+    <h3>Alumnos Inscritos</h3>
+    {% if alumnos_inscritos %}
+        <table border="1">
+            <thead>
+                <tr>
+                    <th>Apellido</th>
+                    <th>Nombre</th>
+                    <th>Email</th>
+                    <th>Teléfono</th>
+                    <th>Legajo</th>
+                    <th>Fecha de Inscripción</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for inscripcion in alumnos_inscritos %}
+                <tr>
+                    <td>{{ inscripcion.alumno.apellido }}</td>
+                    <td>{{ inscripcion.alumno.nombre }}</td>
+                    <td>{{ inscripcion.alumno.email }}</td>
+                    <td>{{ inscripcion.alumno.telefono|default:"No especificado" }}</td>
+                    <td>{{ inscripcion.alumno.legajo }}</td>
+                    <td>{{ inscripcion.fecha_inscripcion|date:"d/m/Y" }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        
+        <p><strong>Total de alumnos inscritos:</strong> {{ alumnos_inscritos|length }}</p>
+    {% else %}
+        <p>No hay alumnos inscritos en esta materia.</p>
+    {% endif %}
+
+{% endif %}
+
+<hr>
+<h3>Enlaces Relacionados</h3>
+<ul>
+    <li><a href="{% url 'gestion_academica:consultas_carrera' %}">Consultas por Carrera</a></li>
+    <li><a href="{% url 'gestion_academica:materias_publicas' %}">Ver Todas las Materias</a></li>
+    <li><a href="{% url 'gestion_academica:materias_con_cupo' %}">Ver Materias con Cupo Disponible</a></li>
+</ul>
+{% endblock %}
