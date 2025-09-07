@@ -3,6 +3,7 @@ Comando personalizado para cargar datos iniciales de ejemplo
 """
 
 from django.core.management.base import BaseCommand
+from django.contrib.auth.models import Group
 from django.db import transaction
 from datetime import date
 from gestion_academica.models import Usuario, Carrera, Materia, Alumno, Inscripcion
@@ -32,6 +33,11 @@ class Command(BaseCommand):
         
         try:
             with transaction.atomic():
+                # Obtener grupos (deben existir previamente)
+                admin_group = Group.objects.get(name='Administradores')
+                alumno_group = Group.objects.get(name='Alumnos')
+                invitado_group = Group.objects.get(name='Invitados')
+
                 # Crear usuarios administradores adicionales
                 admin_user, created = Usuario.objects.get_or_create(
                     email='admin@crui.edu.ar',
@@ -39,7 +45,6 @@ class Command(BaseCommand):
                         'username': '12345678',
                         'first_name': 'Administrador',
                         'last_name': 'Sistema',
-                        'rol': 'administrador',
                         'primer_login': False,
                         'is_staff': True,
                         'is_active': True,
@@ -48,6 +53,7 @@ class Command(BaseCommand):
                 if created:
                     admin_user.set_password('admin123')
                     admin_user.save()
+                    admin_user.groups.add(admin_group)
                     self.stdout.write(f'✓ Usuario administrador creado: {admin_user.email}')
 
                 # Crear usuario invitado
@@ -57,7 +63,6 @@ class Command(BaseCommand):
                         'username': '87654321',
                         'first_name': 'Usuario',
                         'last_name': 'Invitado',
-                        'rol': 'invitado',
                         'primer_login': False,
                         'is_active': True,
                     }
@@ -65,6 +70,7 @@ class Command(BaseCommand):
                 if created:
                     invitado_user.set_password('87654321')
                     invitado_user.save()
+                    invitado_user.groups.add(invitado_group)
                     self.stdout.write(f'✓ Usuario invitado creado: {invitado_user.email}')
 
                 # Crear carreras de ejemplo
@@ -198,44 +204,36 @@ class Command(BaseCommand):
                 alumnos_data = [
                     {
                         'username': '20123456',
-                        'nombre': 'Juan Carlos',
-                        'apellido': 'González',
+                        'first_name': 'Juan Carlos',
+                        'last_name': 'González',
                         'email': 'juan.gonzalez@estudiante.crui.edu.ar',
-                        'telefono': '+54 11 1234-5678',
-                        'fecha_nacimiento': date(2000, 3, 15),
                         'legajo': '2024001',
                         'carrera': 'TSP2024',
                         'año_ingreso': 2024
                     },
                     {
                         'username': '20234567',
-                        'nombre': 'María Elena',
-                        'apellido': 'Rodríguez',
+                        'first_name': 'María Elena',
+                        'last_name': 'Rodríguez',
                         'email': 'maria.rodriguez@estudiante.crui.edu.ar',
-                        'telefono': '+54 11 2345-6789',
-                        'fecha_nacimiento': date(1999, 7, 22),
                         'legajo': '2024002',
                         'carrera': 'TSP2024',
                         'año_ingreso': 2024
                     },
                     {
                         'username': '20345678',
-                        'nombre': 'Carlos Alberto',
-                        'apellido': 'Fernández',
+                        'first_name': 'Carlos Alberto',
+                        'last_name': 'Fernández',
                         'email': 'carlos.fernandez@estudiante.crui.edu.ar',
-                        'telefono': '+54 11 3456-7890',
-                        'fecha_nacimiento': date(2001, 1, 10),
                         'legajo': '2024003',
                         'carrera': 'TSAS2024',
                         'año_ingreso': 2024
                     },
                     {
                         'username': '20456789',
-                        'nombre': 'Ana Sofía',
-                        'apellido': 'López',
+                        'first_name': 'Ana Sofía',
+                        'last_name': 'López',
                         'email': 'ana.lopez@estudiante.crui.edu.ar',
-                        'telefono': '+54 11 4567-8901',
-                        'fecha_nacimiento': date(2000, 11, 5),
                         'legajo': '2024004',
                         'carrera': 'TSRC2024',
                         'año_ingreso': 2024
@@ -251,9 +249,8 @@ class Command(BaseCommand):
                     usuario_data = {
                         'username': alumno_data['username'],
                         'email': alumno_data['email'],
-                        'first_name': alumno_data['nombre'],
-                        'last_name': alumno_data['apellido'],
-                        'rol': 'alumno',
+                        'first_name': alumno_data['first_name'],
+                        'last_name': alumno_data['last_name'],
                         'is_active': True,
                     }
                     
@@ -265,19 +262,14 @@ class Command(BaseCommand):
                     if user_created:
                         usuario.set_password(alumno_data['username'])  # DNI como contraseña
                         usuario.save()
+                        usuario.groups.add(alumno_group)  # Agregar al grupo de alumnos
                     
-                    # Ahora crear el alumno
+                    # Ahora crear el alumno usando composición
                     alumno_final_data = {
-                        'nombre': alumno_data['nombre'],
-                        'apellido': alumno_data['apellido'],
-                        'email': alumno_data['email'],
-                        'telefono': alumno_data['telefono'],
-                        'fecha_nacimiento': alumno_data['fecha_nacimiento'],
                         'legajo': alumno_data['legajo'],
                         'carrera': carrera,
                         'usuario': usuario,
                         'año_ingreso': alumno_data['año_ingreso'],
-                        'username': alumno_data['username'],
                     }
                     
                     alumno, created = Alumno.objects.get_or_create(

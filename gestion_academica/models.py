@@ -1,6 +1,6 @@
 """
 Modelos para el sistema de gestión académica.
-Implementa herencia, abstracción y encapsulamiento según POO.
+Implementa composición y uso de grupos de Django para roles.
 """
 
 from django.db import models
@@ -9,62 +9,12 @@ from django.core.validators import RegexValidator, MinValueValidator, MaxValueVa
 from django.core.exceptions import ValidationError
 
 
-# Clase abstracta base para aplicar herencia
-class Persona(models.Model):
-    """
-    Clase base abstracta que define los atributos comunes 
-    de todas las personas en el sistema.
-    Aplica el principio de herencia de POO.
-    """
-    username = models.CharField(
-        max_length=8, 
-        unique=True, 
-        validators=[RegexValidator(regex=r'^\d{8}$', message='El DNI debe tener 8 dígitos')],
-        verbose_name='DNI',
-        db_column='dni'
-    )
-    # def get_dni(self):
-    #     return self.username
-    nombre = models.CharField(max_length=100, verbose_name='Nombre')
-    apellido = models.CharField(max_length=100, verbose_name='Apellido')
-    email = models.EmailField(unique=True, verbose_name='Correo Electrónico')
-    telefono = models.CharField(
-        max_length=15, 
-        blank=True, 
-        validators=[RegexValidator(regex=r'^\+?1?\d{9,15}$', message='Formato de teléfono inválido')],
-        verbose_name='Teléfono'
-    )
-    fecha_nacimiento = models.DateField(verbose_name='Fecha de Nacimiento')
-    fecha_creacion = models.DateTimeField(auto_now_add=True, verbose_name='Fecha de Creación')
-    fecha_modificacion = models.DateTimeField(auto_now=True, verbose_name='Fecha de Modificación')
-
-    class Meta:
-        abstract = True  # Clase abstracta - no crea tabla en BD
-
-    def __str__(self):
-        return f"{self.nombre} {self.apellido} (DNI: {self.username})"
-
-    @property
-    def nombre_completo(self):
-        """Propiedad que encapsula la lógica de nombre completo"""
-        return f"{self.nombre} {self.apellido}"
-
-
 class Usuario(AbstractUser):
     """
     Modelo de usuario personalizado para autenticación.
-    Extiende AbstractUser de Django para manejar roles.
+    Usa grupos de Django en lugar de campo rol para mejor flexibilidad.
     """
-    ROLES = [
-        ('administrador', 'Administrador'),
-        ('alumno', 'Alumno'),
-        ('invitado', 'Invitado'),
-        ('docente', 'Docente'),
-        ('preceptor', 'Preceptor'),
-    ]
-    
     # Usamos email como username
-    
     email = models.EmailField(unique=True, verbose_name='Correo Electrónico')
     username = models.CharField(
         max_length=8, 
@@ -73,11 +23,10 @@ class Usuario(AbstractUser):
         verbose_name='DNI',
         db_column='dni'
     )
-    rol = models.CharField(max_length=20, choices=ROLES, verbose_name='Rol')
     primer_login = models.BooleanField(default=True, verbose_name='Primer Login')
     
     USERNAME_FIELD = 'email'
-    REQUIRED_FIELDS = ['username', 'first_name', 'last_name', 'rol']
+    REQUIRED_FIELDS = ['username', 'first_name', 'last_name']
 
     class Meta:
         verbose_name = 'Usuario'
@@ -85,6 +34,37 @@ class Usuario(AbstractUser):
 
     def __str__(self):
         return f"{self.first_name} {self.last_name} ({self.get_rol_display()})"
+
+    @property
+    def rol(self):
+        """Obtiene el rol principal del usuario basado en grupos"""
+        if self.is_superuser:
+            return 'administrador'
+        if self.groups.filter(name='Administradores').exists():
+            return 'administrador'
+        elif self.groups.filter(name='Alumnos').exists():
+            return 'alumno'
+        elif self.groups.filter(name='Docentes').exists():
+            return 'docente'
+        elif self.groups.filter(name='Preceptores').exists():
+            return 'preceptor'
+        else:
+            return 'invitado'
+
+    def get_rol_display(self):
+        """Muestra el nombre del rol para templates"""
+        roles = {
+            'administrador': 'Administrador',
+            'alumno': 'Alumno',
+            'docente': 'Docente',
+            'preceptor': 'Preceptor',
+            'invitado': 'Invitado',
+        }
+        return roles.get(self.rol, 'Sin rol')
+
+    def has_role(self, role_name):
+        """Verifica si el usuario tiene un rol específico"""
+        return self.rol == role_name or self.groups.filter(name=f"{role_name.title()}s").exists()
 
     def save(self, *args, **kwargs):
         """
@@ -210,11 +190,20 @@ class Materia(models.Model):
         super().delete(*args, **kwargs)
 
 
-class Alumno(Persona):
+class Alumno(models.Model):
     """
-    Modelo para alumnos que hereda de Persona.
-    Implementa herencia de POO.
+    Modelo para alumnos usando composición en lugar de herencia.
+    Tiene una relación con Usuario y contiene datos específicos del alumno.
     """
+    # Composición: relación con Usuario en lugar de herencia
+    usuario = models.OneToOneField(
+        Usuario, 
+        on_delete=models.CASCADE, 
+        related_name='perfil_alumno',
+        verbose_name='Usuario'
+    )
+    
+    # Datos específicos del alumno
     legajo = models.CharField(
         max_length=20, 
         unique=True,
@@ -227,14 +216,6 @@ class Alumno(Persona):
         related_name='alumnos',
         verbose_name='Carrera'
     )
-    usuario = models.OneToOneField(
-        Usuario, 
-        on_delete=models.CASCADE, 
-        related_name='alumno',
-        null=True, 
-        blank=True,
-        verbose_name='Usuario'
-    )
     año_ingreso = models.PositiveIntegerField(
         validators=[MinValueValidator(2000), MaxValueValidator(2030)],
         verbose_name='Año de Ingreso'
@@ -244,9 +225,38 @@ class Alumno(Persona):
     class Meta:
         verbose_name = 'Alumno'
         verbose_name_plural = 'Alumnos'
-        ordering = ['apellido', 'nombre']
+        ordering = ['usuario__last_name', 'usuario__first_name']
+
+    def __str__(self):
+        return f"{self.nombre_completo} (Legajo: {self.legajo})"
+
+    @property
+    def nombre_completo(self):
+        """Acceso a nombre completo a través de composición"""
+        return f"{self.usuario.first_name} {self.usuario.last_name}"
+
+    @property
+    def nombre(self):
+        """Acceso al nombre a través de composición"""
+        return self.usuario.first_name
+
+    @property
+    def apellido(self):
+        """Acceso al apellido a través de composición"""
+        return self.usuario.last_name
+
+    @property
+    def email(self):
+        """Acceso al email a través de composición"""
+        return self.usuario.email
+
+    @property
+    def dni(self):
+        """Acceso al DNI a través de composición"""
+        return self.usuario.username
 
     def clean(self):
+        """Validaciones personalizadas"""
         """Validaciones personalizadas"""
         super().clean()
         # Si tiene usuario, validar que los datos coincidan

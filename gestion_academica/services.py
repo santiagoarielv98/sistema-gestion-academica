@@ -6,6 +6,7 @@ Implementa la separación de capas y abstracción de la lógica.
 from django.db import transaction, IntegrityError
 from django.core.exceptions import ValidationError
 from django.contrib.auth import authenticate
+from django.contrib.auth.models import Group
 from django.utils import timezone
 from .models import Usuario, Carrera, Materia, Alumno, Inscripcion
 
@@ -16,14 +17,14 @@ class UsuarioService:
     """
     
     @staticmethod
-    def crear_usuario(email, dni, nombre, apellido, rol, password=None):
+    def crear_usuario(email, dni, nombre, apellido, grupos=None, password=None):
         """
         Crea un nuevo usuario con validaciones de negocio
         """
         try:
             with transaction.atomic():
                 # Validar que no exista el DNI o email
-                if Usuario.objects.filter(dni=dni).exists():
+                if Usuario.objects.filter(username=dni).exists():
                     raise ValidationError(f'Ya existe un usuario con DNI {dni}')
                 
                 if Usuario.objects.filter(email=email).exists():
@@ -32,12 +33,15 @@ class UsuarioService:
                 # Crear usuario
                 usuario = Usuario.objects.create_user(
                     email=email,
-                    dni=dni,
+                    username=dni,
                     first_name=nombre,
                     last_name=apellido,
-                    rol=rol,
                     password=password or dni  # Contraseña inicial es el DNI
                 )
+                
+                # Asignar grupos si se proporcionan
+                if grupos:
+                    usuario.groups.set(grupos)
                 
                 return usuario
                 
@@ -206,37 +210,46 @@ class MateriaService:
 
 class AlumnoService:
     """
-    Servicio para gestionar la lógica de negocio de alumnos
+    Servicio para gestionar la lógica de negocio de alumnos usando composición
     """
     
     @staticmethod
-    def crear_alumno(dni, nombre, apellido, email, telefono, fecha_nacimiento, 
-                    legajo, carrera_id, año_ingreso):
+    def crear_alumno(dni, nombre, apellido, email, legajo, carrera_id, año_ingreso):
         """
-        Crea un nuevo alumno con validaciones
+        Crea un nuevo alumno con validaciones usando composición
         """
         try:
             with transaction.atomic():
                 # Validar que no exista el DNI, email o legajo
-                if Alumno.objects.filter(dni=dni).exists():
-                    raise ValidationError(f'Ya existe un alumno con DNI {dni}')
+                if Usuario.objects.filter(username=dni).exists():
+                    raise ValidationError(f'Ya existe un usuario con DNI {dni}')
                 
-                if Alumno.objects.filter(email=email).exists():
-                    raise ValidationError(f'Ya existe un alumno con email {email}')
+                if Usuario.objects.filter(email=email).exists():
+                    raise ValidationError(f'Ya existe un usuario con email {email}')
                 
                 if Alumno.objects.filter(legajo=legajo).exists():
                     raise ValidationError(f'Ya existe un alumno con legajo {legajo}')
                 
                 carrera = Carrera.objects.get(id=carrera_id)
                 
+                # Crear usuario primero
+                usuario = Usuario.objects.create(
+                    username=dni,
+                    first_name=nombre.strip().title(),
+                    last_name=apellido.strip().title(),
+                    email=email.lower(),
+                    is_active=True
+                )
+                usuario.set_password(dni)  # DNI como contraseña inicial
+                usuario.save()
+                
+                # Agregar al grupo de alumnos
+                alumno_group = Group.objects.get(name='Alumnos')
+                usuario.groups.add(alumno_group)
+                
                 # Crear alumno
                 alumno = Alumno.objects.create(
-                    dni=dni,
-                    nombre=nombre.strip().title(),
-                    apellido=apellido.strip().title(),
-                    email=email.lower(),
-                    telefono=telefono,
-                    fecha_nacimiento=fecha_nacimiento,
+                    usuario=usuario,
                     legajo=legajo,
                     carrera=carrera,
                     año_ingreso=año_ingreso
@@ -246,6 +259,8 @@ class AlumnoService:
                 
         except Carrera.DoesNotExist:
             raise ValidationError('La carrera especificada no existe')
+        except Group.DoesNotExist:
+            raise ValidationError('El grupo "Alumnos" no existe. Ejecute el comando crear_grupos')
         except IntegrityError as e:
             raise ValidationError(f'Error de integridad: {str(e)}')
     
@@ -256,7 +271,7 @@ class AlumnoService:
         """
         try:
             carrera = Carrera.objects.get(id=carrera_id)
-            return Alumno.objects.filter(carrera=carrera, activo=True).order_by('apellido', 'nombre')
+            return Alumno.objects.filter(carrera=carrera, activo=True).order_by('usuario__last_name', 'usuario__first_name')
         except Carrera.DoesNotExist:
             raise ValidationError('La carrera especificada no existe')
 

@@ -105,40 +105,53 @@ class UsuarioForm(forms.ModelForm):
         required=False,
         help_text='Dejar vacío para usar DNI como contraseña inicial'
     )
+    
+    grupos = forms.ModelMultipleChoiceField(
+        queryset=None,
+        widget=forms.CheckboxSelectMultiple,
+        required=False,
+        label='Roles/Grupos'
+    )
 
     class Meta:
         model = Usuario
-        fields = ['email', 'username', 'first_name', 'last_name', 'rol', 'password']
+        fields = ['email', 'username', 'first_name', 'last_name', 'password']
         labels = {
             'email': 'Correo Electrónico',
             'username': 'DNI',
             'first_name': 'Nombre',
             'last_name': 'Apellido',
-            'rol': 'Rol',
         }
         widgets = {
             'email': forms.EmailInput(attrs={'placeholder': 'correo@ejemplo.com'}),
-            'dni': forms.TextInput(attrs={'placeholder': '12345678', 'maxlength': '8'}),
+            'username': forms.TextInput(attrs={'placeholder': '12345678', 'maxlength': '8'}),
             'first_name': forms.TextInput(attrs={'placeholder': 'Nombre'}),
             'last_name': forms.TextInput(attrs={'placeholder': 'Apellido'}),
         }
 
-    def clean_dni(self):
-        dni = self.cleaned_data.get('dni')
-        if dni:
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        from django.contrib.auth.models import Group
+        self.fields['grupos'].queryset = Group.objects.all()
+        if self.instance.pk:
+            self.fields['grupos'].initial = self.instance.groups.all()
+
+    def clean_username(self):
+        username = self.cleaned_data.get('username')
+        if username:
             # Validar que solo contenga dígitos y tenga 8 caracteres
-            if not dni.isdigit() or len(dni) != 8:
+            if not username.isdigit() or len(username) != 8:
                 raise ValidationError('El DNI debe tener exactamente 8 dígitos.')
             
             # Validar unicidad (excepto si estamos editando el mismo usuario)
             if self.instance.pk:
-                if Usuario.objects.filter(dni=dni).exclude(pk=self.instance.pk).exists():
+                if Usuario.objects.filter(username=username).exclude(pk=self.instance.pk).exists():
                     raise ValidationError('Ya existe un usuario con este DNI.')
             else:
-                if Usuario.objects.filter(dni=dni).exists():
+                if Usuario.objects.filter(username=username).exists():
                     raise ValidationError('Ya existe un usuario con este DNI.')
         
-        return dni
+        return username
 
     def clean_email(self):
         email = self.cleaned_data.get('email')
@@ -159,7 +172,7 @@ class UsuarioForm(forms.ModelForm):
         
         # Si no se proporciona contraseña, usar el DNI
         if not password:
-            password = self.cleaned_data['dni']
+            password = self.cleaned_data['username']
         
         if not usuario.pk:  # Usuario nuevo
             usuario.set_password(password)
@@ -169,6 +182,10 @@ class UsuarioForm(forms.ModelForm):
         
         if commit:
             usuario.save()
+            # Manejar grupos
+            grupos = self.cleaned_data.get('grupos')
+            if grupos:
+                usuario.groups.set(grupos)
         
         return usuario
 
@@ -289,30 +306,38 @@ class MateriaForm(forms.ModelForm):
 
 class AlumnoForm(forms.ModelForm):
     """
-    Formulario para crear y editar alumnos
+    Formulario para crear y editar alumnos usando composición
     """
+    # Campos del usuario
+    dni = forms.CharField(
+        max_length=8,
+        label='DNI',
+        widget=forms.TextInput(attrs={'placeholder': '12345678', 'maxlength': '8'})
+    )
+    nombre = forms.CharField(
+        max_length=100,
+        label='Nombre',
+        widget=forms.TextInput(attrs={'placeholder': 'Nombre'})
+    )
+    apellido = forms.CharField(
+        max_length=100,
+        label='Apellido',
+        widget=forms.TextInput(attrs={'placeholder': 'Apellido'})
+    )
+    email = forms.EmailField(
+        label='Correo Electrónico',
+        widget=forms.EmailInput(attrs={'placeholder': 'correo@ejemplo.com'})
+    )
+
     class Meta:
         model = Alumno
-        fields = ['nombre', 'apellido', 'email', 'telefono', 'fecha_nacimiento', 
-                 'legajo', 'carrera', 'año_ingreso']
+        fields = ['legajo', 'carrera', 'año_ingreso']
         labels = {
-            'username': 'DNI',
-            'nombre': 'Nombre',
-            'apellido': 'Apellido',
-            'email': 'Correo Electrónico',
-            'telefono': 'Teléfono',
-            'fecha_nacimiento': 'Fecha de Nacimiento',
             'legajo': 'Legajo',
             'carrera': 'Carrera',
             'año_ingreso': 'Año de Ingreso',
         }
         widgets = {
-            'username': forms.TextInput(attrs={'placeholder': '12345678', 'maxlength': '8'}),
-            'nombre': forms.TextInput(attrs={'placeholder': 'Nombre'}),
-            'apellido': forms.TextInput(attrs={'placeholder': 'Apellido'}),
-            'email': forms.EmailInput(attrs={'placeholder': 'correo@ejemplo.com'}),
-            'telefono': forms.TextInput(attrs={'placeholder': '+54 11 1234-5678'}),
-            'fecha_nacimiento': forms.DateInput(attrs={'type': 'date'}),
             'legajo': forms.TextInput(attrs={'placeholder': '2024001'}),
             'año_ingreso': forms.NumberInput(attrs={'min': '2000', 'max': '2030'}),
         }
@@ -321,6 +346,13 @@ class AlumnoForm(forms.ModelForm):
         super().__init__(*args, **kwargs)
         # Filtrar solo carreras activas
         self.fields['carrera'].queryset = Carrera.objects.filter(activa=True)
+        
+        # Si estamos editando, cargar datos del usuario relacionado
+        if self.instance.pk and hasattr(self.instance, 'usuario'):
+            self.fields['dni'].initial = self.instance.usuario.username
+            self.fields['nombre'].initial = self.instance.usuario.first_name
+            self.fields['apellido'].initial = self.instance.usuario.last_name
+            self.fields['email'].initial = self.instance.usuario.email
 
     def clean_dni(self):
         dni = self.cleaned_data.get('dni')
@@ -329,13 +361,13 @@ class AlumnoForm(forms.ModelForm):
             if not dni.isdigit() or len(dni) != 8:
                 raise ValidationError('El DNI debe tener exactamente 8 dígitos.')
             
-            # Validar unicidad (excepto si estamos editando el mismo alumno)
-            if self.instance.pk:
-                if Alumno.objects.filter(dni=dni).exclude(pk=self.instance.pk).exists():
-                    raise ValidationError('Ya existe un alumno con este DNI.')
+            # Validar unicidad en usuarios (excepto si estamos editando el mismo)
+            if self.instance.pk and hasattr(self.instance, 'usuario'):
+                if Usuario.objects.filter(username=dni).exclude(pk=self.instance.usuario.pk).exists():
+                    raise ValidationError('Ya existe un usuario con este DNI.')
             else:
-                if Alumno.objects.filter(dni=dni).exists():
-                    raise ValidationError('Ya existe un alumno con este DNI.')
+                if Usuario.objects.filter(username=dni).exists():
+                    raise ValidationError('Ya existe un usuario con este DNI.')
         
         return dni
 
@@ -343,13 +375,13 @@ class AlumnoForm(forms.ModelForm):
         email = self.cleaned_data.get('email')
         if email:
             email = email.lower()
-            # Validar unicidad (excepto si estamos editando el mismo alumno)
-            if self.instance.pk:
-                if Alumno.objects.filter(email=email).exclude(pk=self.instance.pk).exists():
-                    raise ValidationError('Ya existe un alumno con este email.')
+            # Validar unicidad en usuarios (excepto si estamos editando el mismo)
+            if self.instance.pk and hasattr(self.instance, 'usuario'):
+                if Usuario.objects.filter(email=email).exclude(pk=self.instance.usuario.pk).exists():
+                    raise ValidationError('Ya existe un usuario con este email.')
             else:
-                if Alumno.objects.filter(email=email).exists():
-                    raise ValidationError('Ya existe un alumno con este email.')
+                if Usuario.objects.filter(email=email).exists():
+                    raise ValidationError('Ya existe un usuario con este email.')
         
         return email
 
@@ -377,6 +409,43 @@ class AlumnoForm(forms.ModelForm):
         if apellido:
             apellido = apellido.strip().title()
         return apellido
+
+    def save(self, commit=True):
+        from django.contrib.auth.models import Group
+        
+        alumno = super().save(commit=False)
+        
+        # Crear o actualizar usuario
+        if self.instance.pk and hasattr(self.instance, 'usuario'):
+            # Editar usuario existente
+            usuario = self.instance.usuario
+            usuario.username = self.cleaned_data['dni']
+            usuario.first_name = self.cleaned_data['nombre']
+            usuario.last_name = self.cleaned_data['apellido']
+            usuario.email = self.cleaned_data['email']
+            usuario.save()
+        else:
+            # Crear nuevo usuario
+            usuario = Usuario.objects.create(
+                username=self.cleaned_data['dni'],
+                first_name=self.cleaned_data['nombre'],
+                last_name=self.cleaned_data['apellido'],
+                email=self.cleaned_data['email'],
+                is_active=True
+            )
+            usuario.set_password(self.cleaned_data['dni'])  # DNI como contraseña inicial
+            usuario.save()
+            
+            # Agregar al grupo de alumnos
+            alumno_group = Group.objects.get(name='Alumnos')
+            usuario.groups.add(alumno_group)
+            
+            alumno.usuario = usuario
+        
+        if commit:
+            alumno.save()
+        
+        return alumno
 
 
 class InscripcionForm(forms.ModelForm):
