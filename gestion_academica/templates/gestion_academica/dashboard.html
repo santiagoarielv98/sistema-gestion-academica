@@ -14,17 +14,17 @@
     {% if user.rol == 'administrador' %}
         <h3>Panel de Administrador</h3>
         <ul>
-            <li><a href="{% url 'gestion_academica:carreras_list' %}">Gestionar Carreras</a></li>
-            <li><a href="{% url 'gestion_academica:materias_list' %}">Gestionar Materias</a></li>
-            <li><a href="{% url 'gestion_academica:alumnos_list' %}">Gestionar Alumnos</a></li>
-            <li><a href="{% url 'gestion_academica:usuarios_list' %}">Gestionar Usuarios</a></li>
-            <li><a href="{% url 'gestion_academica:inscripciones_list' %}">Gestionar Inscripciones</a></li>
+            <li><a href="{% url 'gestion_academica:carrera_list' %}">Gestionar Carreras</a></li>
+            <li><a href="{% url 'gestion_academica:materia_list' %}">Gestionar Materias</a></li>
+            <li><a href="{% url 'gestion_academica:alumno_list' %}">Gestionar Alumnos</a></li>
+            <li><a href="{% url 'gestion_academica:usuario_list' %}">Gestionar Usuarios</a></li>
+            <li><a href="{% url 'gestion_academica:inscripcion_list' %}">Gestionar Inscripciones</a></li>
         </ul>
         
         <h4>Consultas y Reportes</h4>
         <ul>
-            <li><a href="{% url 'gestion_academica:consultas_carrera' %}">Consultas por Carrera</a></li>
-            <li><a href="{% url 'gestion_academica:consultas_materia' %}">Consultas por Materia</a></li>
+            <li><a href="{% url 'gestion_academica:materias_por_carrera' %}">Consultas por Carrera</a></li>
+            <li><a href="{% url 'gestion_academica:alumnos_por_materia' %}">Consultas por Materia</a></li>
             <li><a href="{% url 'gestion_academica:materias_con_cupo' %}">Materias con Cupo Disponible</a></li>
         </ul>
 
