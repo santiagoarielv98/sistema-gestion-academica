@@ -4,10 +4,11 @@ from django.views.generic import TemplateView
 from django.core.exceptions import ValidationError
 
 from carrera.models import Carrera
+from inscripcion.models import Inscripcion
 from inscripcion.services import InscripcionService
 from materia.models import Materia
 from materia.services import MateriaService
-from usuario.views import AdminRequiredMixin
+from usuario.views import AdminRequiredMixin, AlumnoRequiredMixin
 
 from .services import ReportesService
 from .forms import FiltroMateriaForm
@@ -116,4 +117,24 @@ class ReportesView(AdminRequiredMixin, TemplateView):
         context = super().get_context_data(**kwargs)
         context['reporte'] = ReportesService.reporte_general()
         context['materias_por_carrera'] = ReportesService.materias_con_cupo_por_carrera()
+        return context
+
+class OfertaAcademicaView(AlumnoRequiredMixin, TemplateView):
+    """Vista para que el alumno vea la oferta académica de su carrera"""
+    template_name = 'gestion_academica/alumno/oferta_academica.html'
+    
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        try:
+            alumno = self.request.user.alumno
+            context['alumno'] = alumno
+            context['materias'] = MateriaService.obtener_materias_por_carrera(alumno.carrera.id)
+            
+            # Materias en las que ya está inscripto
+            inscripciones = Inscripcion.objects.filter(alumno=alumno, activa=True)
+            context['materias_inscripto'] = [i.materia.id for i in inscripciones]
+            
+        except Exception as e:
+            messages.error(self.request, 'No se pudo cargar la oferta académica.')
+        
         return context
