@@ -24,5 +24,5 @@ def redirect_to_dashboard(request):
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('', include('gestion_academica.urls')),
-    path('', include('usuarios.urls')),
+    path('', include('usuario.urls')),
 ]

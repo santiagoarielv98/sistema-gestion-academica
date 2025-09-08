@@ -37,7 +37,7 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'usuarios',
+    'usuario',
     'gestion_academica',
 ]
 
@@ -124,7 +124,7 @@ STATIC_URL = 'static/'
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 # Modelo de usuario personalizado
-AUTH_USER_MODEL = 'usuarios.Usuario'
+AUTH_USER_MODEL = 'usuario.Usuario'
 
 # URLs de autenticación
 LOGIN_URL = '/login/'
