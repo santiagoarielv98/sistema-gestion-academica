@@ -5,8 +5,12 @@ Comando personalizado para cargar datos iniciales de ejemplo
 from django.core.management.base import BaseCommand
 from django.contrib.auth.models import Group
 from django.db import transaction
-from datetime import date
-from gestion_academica.models import Usuario, Carrera, Materia, Alumno, Inscripcion
+
+from alumno.models import Alumno
+from carrera.models import Carrera
+from inscripcion.models import Inscripcion
+from materia.models import Materia
+from usuario.models import Usuario
 
 
 class Command(BaseCommand):

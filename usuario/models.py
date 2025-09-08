@@ -4,10 +4,6 @@ from django.contrib.auth.models import AbstractUser, Group
 from django.core.validators import RegexValidator
 
 class Usuario(AbstractUser):
-    """
-    Modelo de usuario personalizado para autenticación.
-    Usa grupos de Django en lugar de campo rol para mejor flexibilidad.
-    """
     email = models.EmailField(unique=True, verbose_name='Correo Electrónico')
     username = models.CharField(
         max_length=8, 
@@ -30,7 +26,6 @@ class Usuario(AbstractUser):
 
     @property
     def rol(self):
-        """Obtiene el rol principal del usuario basado en grupos"""
         if self.is_superuser:
             return 'administrador'
         if self.groups.filter(name='Administradores').exists():
@@ -45,7 +40,6 @@ class Usuario(AbstractUser):
             return 'invitado'
 
     def get_rol_display(self):
-        """Muestra el nombre del rol para templates"""
         roles = {
             'administrador': 'Administrador',
             'alumno': 'Alumno',
@@ -55,14 +49,10 @@ class Usuario(AbstractUser):
         }
         return roles.get(self.rol, 'Sin rol')
 
-    def has_role(self, role_name):
-        """Verifica si el usuario tiene un rol específico"""
-        return self.rol == role_name or self.groups.filter(name=f"{role_name.title()}s").exists()
+    # def has_role(self, role_name):
+    #     return self.rol == role_name or self.groups.filter(name=f"{role_name.title()}s").exists()
 
     def save(self, *args, **kwargs):
-        """
-        Sobrescribe save para generar contraseña inicial si es nuevo usuario
-        """
         if not self.pk and not self.password:
             # Contraseña inicial es el DNI
             self.set_password(self.username)
@@ -70,9 +60,6 @@ class Usuario(AbstractUser):
 
     @classmethod
     def crear_con_grupo(cls, username, first_name, last_name, email, grupo_name, password=None):
-        """
-        Método de clase para crear un usuario y asignarlo a un grupo automáticamente
-        """
         from django.db import transaction
         
         with transaction.atomic():
