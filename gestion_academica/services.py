@@ -219,43 +219,30 @@ class AlumnoService:
         Crea un nuevo alumno con validaciones usando composición
         """
         try:
-            with transaction.atomic():
-                # Validar que no exista el DNI, email o legajo
-                if Usuario.objects.filter(username=dni).exists():
-                    raise ValidationError(f'Ya existe un usuario con DNI {dni}')
-                
-                if Usuario.objects.filter(email=email).exists():
-                    raise ValidationError(f'Ya existe un usuario con email {email}')
-                
-                if Alumno.objects.filter(legajo=legajo).exists():
-                    raise ValidationError(f'Ya existe un alumno con legajo {legajo}')
-                
-                carrera = Carrera.objects.get(id=carrera_id)
-                
-                # Crear usuario primero
-                usuario = Usuario.objects.create(
-                    username=dni,
-                    first_name=nombre.strip().title(),
-                    last_name=apellido.strip().title(),
-                    email=email.lower(),
-                    is_active=True
-                )
-                usuario.set_password(dni)  # DNI como contraseña inicial
-                usuario.save()
-                
-                # Agregar al grupo de alumnos
-                alumno_group = Group.objects.get(name='Alumnos')
-                usuario.groups.add(alumno_group)
-                
-                # Crear alumno
-                alumno = Alumno.objects.create(
-                    usuario=usuario,
-                    legajo=legajo,
-                    carrera=carrera,
-                    año_ingreso=año_ingreso
-                )
-                
-                return alumno
+            # Validaciones previas
+            if Usuario.objects.filter(username=dni).exists():
+                raise ValidationError(f'Ya existe un usuario con DNI {dni}')
+            
+            if Usuario.objects.filter(email=email).exists():
+                raise ValidationError(f'Ya existe un usuario con email {email}')
+            
+            if Alumno.objects.filter(legajo=legajo).exists():
+                raise ValidationError(f'Ya existe un alumno con legajo {legajo}')
+            
+            carrera = Carrera.objects.get(id=carrera_id)
+            
+            # Usar el método de clase para crear automáticamente
+            alumno = Alumno.crear_con_usuario(
+                dni=dni,
+                nombre=nombre,
+                apellido=apellido,
+                email=email,
+                legajo=legajo,
+                carrera=carrera,
+                año_ingreso=año_ingreso
+            )
+            
+            return alumno
                 
         except Carrera.DoesNotExist:
             raise ValidationError('La carrera especificada no existe')

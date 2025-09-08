@@ -425,22 +425,17 @@ class AlumnoForm(forms.ModelForm):
             usuario.email = self.cleaned_data['email']
             usuario.save()
         else:
-            # Crear nuevo usuario
-            usuario = Usuario.objects.create(
-                username=self.cleaned_data['dni'],
-                first_name=self.cleaned_data['nombre'],
-                last_name=self.cleaned_data['apellido'],
-                email=self.cleaned_data['email'],
-                is_active=True
-            )
-            usuario.set_password(self.cleaned_data['dni'])  # DNI como contraseña inicial
-            usuario.save()
-            
-            # Agregar al grupo de alumnos
-            alumno_group = Group.objects.get(name='Alumnos')
-            usuario.groups.add(alumno_group)
-            
-            alumno.usuario = usuario
+            # Usar el método de clase para crear alumno con usuario
+            if commit:
+                return Alumno.crear_con_usuario(
+                    dni=self.cleaned_data['dni'],
+                    nombre=self.cleaned_data['nombre'],
+                    apellido=self.cleaned_data['apellido'],
+                    email=self.cleaned_data['email'],
+                    legajo=alumno.legajo,
+                    carrera=alumno.carrera,
+                    año_ingreso=alumno.año_ingreso
+                )
         
         if commit:
             alumno.save()

@@ -4,9 +4,12 @@ Implementa composición y uso de grupos de Django para roles.
 """
 
 from django.db import models
-from django.contrib.auth.models import AbstractUser
+from django.contrib.auth.models import AbstractUser, Group
 from django.core.validators import RegexValidator, MinValueValidator, MaxValueValidator
 from django.core.exceptions import ValidationError
+from django.db.models.signals import post_save
+from django.dispatch import receiver
+from django.utils import timezone
 
 
 class Usuario(AbstractUser):
@@ -74,6 +77,38 @@ class Usuario(AbstractUser):
             # Contraseña inicial es el DNI
             self.set_password(self.username)
         super().save(*args, **kwargs)
+
+    @classmethod
+    def crear_con_grupo(cls, username, first_name, last_name, email, grupo_name, password=None):
+        """
+        Método de clase para crear un usuario y asignarlo a un grupo automáticamente
+        """
+        from django.db import transaction
+        
+        with transaction.atomic():
+            usuario = cls.objects.create(
+                username=username,
+                first_name=first_name,
+                last_name=last_name,
+                email=email,
+                is_active=True
+            )
+            
+            # Establecer contraseña
+            if password:
+                usuario.set_password(password)
+            else:
+                usuario.set_password(username)  # DNI como contraseña por defecto
+            usuario.save()
+            
+            # Agregar al grupo especificado
+            try:
+                grupo = Group.objects.get(name=grupo_name)
+                usuario.groups.add(grupo)
+            except Group.DoesNotExist:
+                pass  # El grupo se creará con el comando crear_grupos
+            
+            return usuario
 
 
 class Carrera(models.Model):
@@ -257,32 +292,39 @@ class Alumno(models.Model):
 
     def clean(self):
         """Validaciones personalizadas"""
-        """Validaciones personalizadas"""
         super().clean()
-        # Si tiene usuario, validar que los datos coincidan
-        if self.usuario:
-            if self.usuario.username != self.username:
-                raise ValidationError('El DNI del usuario debe coincidir con el del alumno')
-            if self.usuario.email != self.email:
-                raise ValidationError('El email del usuario debe coincidir con el del alumno')
-
-    def save(self, *args, **kwargs):
-        """
-        Sobrescribe save para crear usuario automáticamente si no existe
-        """
-        super().save(*args, **kwargs)
         
-        # Crear usuario si no existe
-        if not self.usuario:
-            usuario = Usuario.objects.create_user(
-                email=self.email,
-                username=self.username,
-                first_name=self.nombre,
-                last_name=self.apellido,
-                rol='alumno'
+        # Validar que el año de ingreso sea lógico
+        if self.año_ingreso and self.año_ingreso > 2030:
+            raise ValidationError('El año de ingreso no puede ser mayor a 2030')
+
+    @classmethod
+    def crear_con_usuario(cls, dni, nombre, apellido, email, legajo, carrera, año_ingreso):
+        """
+        Método de clase para crear un alumno con su usuario automáticamente
+        """
+        from django.db import transaction
+        
+        with transaction.atomic():
+            # Crear usuario usando el método de clase
+            usuario = Usuario.crear_con_grupo(
+                username=dni,
+                first_name=nombre,
+                last_name=apellido,
+                email=email,
+                grupo_name='Alumnos',
+                password=dni
             )
-            self.usuario = usuario
-            super().save(*args, **kwargs)
+            
+            # Crear alumno
+            alumno = cls.objects.create(
+                usuario=usuario,
+                legajo=legajo,
+                carrera=carrera,
+                año_ingreso=año_ingreso
+            )
+            
+            return alumno
 
     @property
     def materias_inscripto(self):
@@ -337,17 +379,35 @@ class Inscripcion(models.Model):
         """
         Sobrescribe save para manejar la lógica de baja
         """
-        if not self.activa and self.fecha_baja is None:
-            from django.utils import timezone
-            self.fecha_baja = timezone.now()
-        elif self.activa:
-            self.fecha_baja = None
-        
+        if not self.pk:  # Nueva inscripción
+            self.fecha_inscripcion = timezone.now()
         super().save(*args, **kwargs)
 
     def dar_de_baja(self):
         """Método para dar de baja la inscripción"""
         self.activa = False
-        from django.utils import timezone
-        self.fecha_baja = timezone.now()
         self.save()
+
+
+# SIGNALS para automatizar la creación de usuarios al crear alumnos
+@receiver(post_save, sender=Alumno)
+def crear_usuario_para_alumno(sender, instance, created, **kwargs):
+    """
+    Signal que se ejecuta después de crear un alumno.
+    Si el alumno no tiene usuario asociado, lo crea automáticamente.
+    Solo se ejecuta si el alumno se crea sin usuario (casos edge).
+    """
+    if created and not instance.usuario:
+        # Crear usuario automáticamente usando el método de clase
+        usuario = Usuario.crear_con_grupo(
+            username=f"temp_{instance.legajo}",  # DNI temporal
+            first_name="Pendiente",  # Se actualizará posteriormente
+            last_name="Pendiente",  # Se actualizará posteriormente
+            email=f"temp_{instance.legajo}@temp.com",  # Email temporal
+            grupo_name='Alumnos',
+            password=instance.legajo
+        )
+        
+        # Asociar el usuario al alumno
+        instance.usuario = usuario
+        instance.save()
