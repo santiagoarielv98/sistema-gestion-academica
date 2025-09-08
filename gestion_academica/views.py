@@ -18,12 +18,12 @@ from django.http import Http404
 
 from .models import Usuario, Carrera, Materia, Alumno, Inscripcion
 from .forms import (
-    LoginForm, CambiarPasswordForm, UsuarioForm, CarreraForm, 
+    LoginForm, CambiarPasswordForm, UsuarioForm,
     MateriaForm, AlumnoForm, InscripcionForm, FiltroMateriaForm,
     FiltroAlumnoMateriaForm
 )
 from .services import (
-    UsuarioService, CarreraService, MateriaService, 
+    UsuarioService, MateriaService, 
     AlumnoService, InscripcionService, ReportesService
 )
 
@@ -138,70 +138,6 @@ class DashboardView(LoginRequiredMixin, TemplateView):
                 messages.error(self.request, 'No se encontró información del alumno.')
         
         return context
-
-
-# === GESTIÓN DE CARRERAS (Solo Admin) ===
-
-class CarreraListView(AdminRequiredMixin, ListView):
-    """Lista todas las carreras"""
-    model = Carrera
-    template_name = 'gestion_academica/carreras/list.html'
-    context_object_name = 'carreras'
-    paginate_by = 10
-    
-    def get_queryset(self):
-        return Carrera.objects.filter(activa=True).order_by('nombre')
-
-
-class CarreraCreateView(AdminRequiredMixin, CreateView):
-    """Crea una nueva carrera"""
-    model = Carrera
-    form_class = CarreraForm
-    template_name = 'gestion_academica/carreras/form.html'
-    success_url = reverse_lazy('carrera_list')
-    
-    def form_valid(self, form):
-        try:
-            response = super().form_valid(form)
-            messages.success(self.request, f'Carrera "{self.object.nombre}" creada exitosamente.')
-            return response
-        except ValidationError as e:
-            messages.error(self.request, str(e))
-            return self.form_invalid(form)
-
-
-class CarreraUpdateView(AdminRequiredMixin, UpdateView):
-    """Edita una carrera existente"""
-    model = Carrera
-    form_class = CarreraForm
-    template_name = 'gestion_academica/carreras/form.html'
-    success_url = reverse_lazy('carrera_list')
-    
-    def form_valid(self, form):
-        try:
-            response = super().form_valid(form)
-            messages.success(self.request, f'Carrera "{self.object.nombre}" actualizada exitosamente.')
-            return response
-        except ValidationError as e:
-            messages.error(self.request, str(e))
-            return self.form_invalid(form)
-
-
-class CarreraDeleteView(AdminRequiredMixin, DeleteView):
-    """Elimina una carrera"""
-    model = Carrera
-    template_name = 'gestion_academica/carreras/confirm_delete.html'
-    success_url = reverse_lazy('carrera_list')
-    
-    def delete(self, request, *args, **kwargs):
-        try:
-            carrera = self.get_object()
-            CarreraService.eliminar_carrera(carrera.id)
-            messages.success(request, f'Carrera "{carrera.nombre}" eliminada exitosamente.')
-            return redirect(self.success_url)
-        except ValidationError as e:
-            messages.error(request, str(e))
-            return redirect('carrera_list')
 
 
 # === GESTIÓN DE MATERIAS (Solo Admin) ===
