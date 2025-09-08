@@ -10,7 +10,7 @@ from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
 from django.contrib import messages
 from django.urls import reverse_lazy, reverse
 from django.views.generic import (
-    View, TemplateView, ListView, CreateView, UpdateView, DeleteView
+    View, TemplateView, ListView, CreateView, UpdateView, DeleteView, DetailView
 )
 from django.db.models import Q, Count
 from django.core.exceptions import ValidationError
@@ -30,9 +30,10 @@ from .services import (
 
 # Mixins para control de acceso
 class AdminRequiredMixin(UserPassesTestMixin):
-    """Mixin que requiere rol de administrador"""
+    """Mixin que requiere grupo de administrador"""
     def test_func(self):
-        return self.request.user.is_authenticated and self.request.user.rol == 'administrador'
+        return (self.request.user.is_authenticated and 
+                self.request.user.groups.filter(name='Administradores').exists())
     
     def handle_no_permission(self):
         messages.error(self.request, 'No tienes permisos para acceder a esta página.')
@@ -40,9 +41,10 @@ class AdminRequiredMixin(UserPassesTestMixin):
 
 
 class AlumnoRequiredMixin(UserPassesTestMixin):
-    """Mixin que requiere rol de alumno"""
+    """Mixin que requiere grupo de alumno"""
     def test_func(self):
-        return self.request.user.is_authenticated and self.request.user.rol == 'alumno'
+        return (self.request.user.is_authenticated and 
+                self.request.user.groups.filter(name='Alumnos').exists())
     
     def handle_no_permission(self):
         messages.error(self.request, 'No tienes permisos para acceder a esta página.')
@@ -116,7 +118,7 @@ class CambiarPasswordView(LoginRequiredMixin, View):
 # === DASHBOARD PRINCIPAL ===
 
 class DashboardView(LoginRequiredMixin, TemplateView):
-    """Vista principal del dashboard según el rol del usuario"""
+    """Vista principal del dashboard según el grupo del usuario"""
     template_name = 'gestion_academica/dashboard.html'
     
     def get_context_data(self, **kwargs):
@@ -125,9 +127,9 @@ class DashboardView(LoginRequiredMixin, TemplateView):
         
         context['user'] = user
         
-        if user.rol == 'administrador':
+        if user.groups.filter(name='Administradores').exists():
             context['reporte'] = ReportesService.reporte_general()
-        elif user.rol == 'alumno':
+        elif user.groups.filter(name='Alumnos').exists():
             try:
                 alumno = user.alumno
                 context['alumno'] = alumno
@@ -288,7 +290,19 @@ class AlumnoListView(AdminRequiredMixin, ListView):
     paginate_by = 10
     
     def get_queryset(self):
-        return Alumno.objects.filter(activo=True).select_related('carrera').order_by('apellido', 'nombre')
+        return Alumno.objects.filter(activo=True).select_related('carrera', 'usuario').order_by('usuario__last_name', 'usuario__first_name')
+
+
+class AlumnoDetailView(AdminRequiredMixin, DetailView):
+    """Muestra los detalles de un alumno"""
+    model = Alumno
+    template_name = 'gestion_academica/alumnos/detail.html'
+    context_object_name = 'object'
+    
+    def get_queryset(self):
+        return Alumno.objects.select_related('carrera', 'usuario').prefetch_related(
+            'inscripciones__materia', 'usuario__groups'
+        )
 
 
 class AlumnoCreateView(AdminRequiredMixin, CreateView):

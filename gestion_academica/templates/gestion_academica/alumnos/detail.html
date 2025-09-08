@@ -1,0 +1,141 @@
+{% extends 'gestion_academica/base.html' %}
+
+{% block title %}Detalle del Alumno - Sistema Académico{% endblock %}
+
+{% block content %}
+<h1>Detalle del Alumno</h1>
+
+<div>
+    <h2>{{ object.nombre_completo }}</h2>
+    
+    <!-- Datos Personales -->
+    <fieldset>
+        <legend>Datos Personales</legend>
+        <table border="1">
+            <tr>
+                <th>DNI:</th>
+                <td>{{ object.dni }}</td>
+            </tr>
+            <tr>
+                <th>Nombre:</th>
+                <td>{{ object.nombre }}</td>
+            </tr>
+            <tr>
+                <th>Apellido:</th>
+                <td>{{ object.apellido }}</td>
+            </tr>
+            <tr>
+                <th>Email:</th>
+                <td>{{ object.email }}</td>
+            </tr>
+        </table>
+    </fieldset>
+    
+    <!-- Datos Académicos -->
+    <fieldset>
+        <legend>Datos Académicos</legend>
+        <table border="1">
+            <tr>
+                <th>Legajo:</th>
+                <td>{{ object.legajo }}</td>
+            </tr>
+            <tr>
+                <th>Carrera:</th>
+                <td>{{ object.carrera.nombre }} ({{ object.carrera.codigo }})</td>
+            </tr>
+            <tr>
+                <th>Año de Ingreso:</th>
+                <td>{{ object.año_ingreso }}</td>
+            </tr>
+            <tr>
+                <th>Estado:</th>
+                <td>{% if object.activo %}Activo{% else %}Inactivo{% endif %}</td>
+            </tr>
+        </table>
+    </fieldset>
+    
+    <!-- Datos del Usuario del Sistema -->
+    <fieldset>
+        <legend>Usuario del Sistema</legend>
+        {% if object.usuario %}
+            <table border="1">
+                <tr>
+                    <th>Email de Acceso:</th>
+                    <td>{{ object.usuario.email }}</td>
+                </tr>
+                <tr>
+                    <th>Usuario:</th>
+                    <td>{{ object.usuario.username }}</td>
+                </tr>
+                <tr>
+                    <th>Estado del Usuario:</th>
+                    <td>{% if object.usuario.is_active %}Activo{% else %}Inactivo{% endif %}</td>
+                </tr>
+                <tr>
+                    <th>Primer Login:</th>
+                    <td>{% if object.usuario.primer_login %}Pendiente{% else %}Completado{% endif %}</td>
+                </tr>
+                <tr>
+                    <th>Grupos/Roles:</th>
+                    <td>
+                        {% for grupo in object.usuario.groups.all %}
+                            {{ grupo.name }}{% if not forloop.last %}, {% endif %}
+                        {% empty %}
+                            Sin grupos asignados
+                        {% endfor %}
+                    </td>
+                </tr>
+                <tr>
+                    <th>Último Acceso:</th>
+                    <td>{% if object.usuario.last_login %}{{ object.usuario.last_login|date:"d/m/Y H:i" }}{% else %}Nunca{% endif %}</td>
+                </tr>
+            </table>
+        {% else %}
+            <p><em>Este alumno no tiene usuario asociado en el sistema.</em></p>
+        {% endif %}
+    </fieldset>
+    
+    <!-- Materias e Inscripciones -->
+    <fieldset>
+        <legend>Inscripciones</legend>
+        {% if object.inscripciones.all %}
+            <table border="1">
+                <thead>
+                    <tr>
+                        <th>Materia</th>
+                        <th>Código</th>
+                        <th>Año</th>
+                        <th>Cuatrimestre</th>
+                        <th>Fecha Inscripción</th>
+                        <th>Estado</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for inscripcion in object.inscripciones.all %}
+                    <tr>
+                        <td>{{ inscripcion.materia.nombre }}</td>
+                        <td>{{ inscripcion.materia.codigo }}</td>
+                        <td>{{ inscripcion.materia.año }}°</td>
+                        <td>{{ inscripcion.materia.get_cuatrimestre_display }}</td>
+                        <td>{{ inscripcion.fecha_inscripcion|date:"d/m/Y" }}</td>
+                        <td>{% if inscripcion.activa %}Activa{% else %}Inactiva{% endif %}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        {% else %}
+            <p><em>El alumno no tiene inscripciones registradas.</em></p>
+        {% endif %}
+    </fieldset>
+</div>
+
+<hr>
+<div>
+    <a href="{% url 'gestion_academica:alumno_update' object.pk %}">Editar Alumno</a> |
+    <a href="{% url 'gestion_academica:alumno_delete' object.pk %}">Eliminar Alumno</a> |
+    {% if object.usuario %}
+        <a href="{% url 'gestion_academica:usuario_update' object.usuario.pk %}">Editar Usuario</a> |
+    {% endif %}
+    <a href="{% url 'gestion_academica:alumno_list' %}">Volver a Lista</a>
+</div>
+{% endblock %}

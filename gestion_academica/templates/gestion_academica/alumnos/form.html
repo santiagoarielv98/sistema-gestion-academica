@@ -10,134 +10,152 @@
 <form method="post">
     {% csrf_token %}
     
-    <div>
-        <label for="{{ form.dni.id_for_label }}">{{ form.dni.label }}</label>
-        {{ form.dni }}
-        {% if form.dni.errors %}
-            <ul>
-                {% for error in form.dni.errors %}
-                    <li>{{ error }}</li>
-                {% endfor %}
-            </ul>
-        {% endif %}
-    </div>
+    <!-- Datos del Usuario -->
+    <fieldset>
+        <legend>Datos Personales</legend>
+        
+        <div>
+            <label for="{{ form.dni.id_for_label }}">{{ form.dni.label }}</label>
+            {{ form.dni }}
+            {% if form.dni.errors %}
+                <ul>
+                    {% for error in form.dni.errors %}
+                        <li>{{ error }}</li>
+                    {% endfor %}
+                </ul>
+            {% endif %}
+            <small>8 dígitos, será usado como contraseña inicial</small>
+        </div>
+        
+        <div>
+            <label for="{{ form.nombre.id_for_label }}">{{ form.nombre.label }}</label>
+            {{ form.nombre }}
+            {% if form.nombre.errors %}
+                <ul>
+                    {% for error in form.nombre.errors %}
+                        <li>{{ error }}</li>
+                    {% endfor %}
+                </ul>
+            {% endif %}
+        </div>
+        
+        <div>
+            <label for="{{ form.apellido.id_for_label }}">{{ form.apellido.label }}</label>
+            {{ form.apellido }}
+            {% if form.apellido.errors %}
+                <ul>
+                    {% for error in form.apellido.errors %}
+                        <li>{{ error }}</li>
+                    {% endfor %}
+                </ul>
+            {% endif %}
+        </div>
+        
+        <div>
+            <label for="{{ form.email.id_for_label }}">{{ form.email.label }}</label>
+            {{ form.email }}
+            {% if form.email.errors %}
+                <ul>
+                    {% for error in form.email.errors %}
+                        <li>{{ error }}</li>
+                    {% endfor %}
+                </ul>
+            {% endif %}
+            <small>Se usará para acceso al sistema</small>
+        </div>
+    </fieldset>
     
-    <div>
-        <label for="{{ form.nombre.id_for_label }}">{{ form.nombre.label }}</label>
-        {{ form.nombre }}
-        {% if form.nombre.errors %}
-            <ul>
-                {% for error in form.nombre.errors %}
-                    <li>{{ error }}</li>
-                {% endfor %}
-            </ul>
-        {% endif %}
-    </div>
-    
-    <div>
-        <label for="{{ form.apellido.id_for_label }}">{{ form.apellido.label }}</label>
-        {{ form.apellido }}
-        {% if form.apellido.errors %}
-            <ul>
-                {% for error in form.apellido.errors %}
-                    <li>{{ error }}</li>
-                {% endfor %}
-            </ul>
-        {% endif %}
-    </div>
-    
-    <div>
-        <label for="{{ form.email.id_for_label }}">{{ form.email.label }}</label>
-        {{ form.email }}
-        {% if form.email.errors %}
-            <ul>
-                {% for error in form.email.errors %}
-                    <li>{{ error }}</li>
-                {% endfor %}
-            </ul>
-        {% endif %}
-    </div>
-    
-    <div>
-        <label for="{{ form.telefono.id_for_label }}">{{ form.telefono.label }}</label>
-        {{ form.telefono }}
-        {% if form.telefono.errors %}
-            <ul>
-                {% for error in form.telefono.errors %}
-                    <li>{{ error }}</li>
-                {% endfor %}
-            </ul>
-        {% endif %}
-    </div>
-    
-    <div>
-        <label for="{{ form.fecha_nacimiento.id_for_label }}">{{ form.fecha_nacimiento.label }}</label>
-        {{ form.fecha_nacimiento }}
-        {% if form.fecha_nacimiento.errors %}
-            <ul>
-                {% for error in form.fecha_nacimiento.errors %}
-                    <li>{{ error }}</li>
-                {% endfor %}
-            </ul>
-        {% endif %}
-    </div>
-    
-    <div>
-        <label for="{{ form.legajo.id_for_label }}">{{ form.legajo.label }}</label>
-        {{ form.legajo }}
-        {% if form.legajo.errors %}
-            <ul>
-                {% for error in form.legajo.errors %}
-                    <li>{{ error }}</li>
-                {% endfor %}
-            </ul>
-        {% endif %}
-    </div>
-    
-    <div>
-        <label for="{{ form.carrera.id_for_label }}">{{ form.carrera.label }}</label>
-        {{ form.carrera }}
-        {% if form.carrera.errors %}
-            <ul>
-                {% for error in form.carrera.errors %}
-                    <li>{{ error }}</li>
-                {% endfor %}
-            </ul>
-        {% endif %}
-    </div>
-    
-    <div>
-        <label for="{{ form.año_ingreso.id_for_label }}">{{ form.año_ingreso.label }}</label>
-        {{ form.año_ingreso }}
-        {% if form.año_ingreso.errors %}
-            <ul>
-                {% for error in form.año_ingreso.errors %}
-                    <li>{{ error }}</li>
-                {% endfor %}
-            </ul>
-        {% endif %}
-    </div>
+    <!-- Datos del Alumno -->
+    <fieldset>
+        <legend>Datos Académicos</legend>
+        
+        <div>
+            <label for="{{ form.legajo.id_for_label }}">{{ form.legajo.label }}</label>
+            {{ form.legajo }}
+            {% if form.legajo.errors %}
+                <ul>
+                    {% for error in form.legajo.errors %}
+                        <li>{{ error }}</li>
+                    {% endfor %}
+                </ul>
+            {% endif %}
+            <small>Número único de identificación del alumno</small>
+        </div>
+        
+        <div>
+            <label for="{{ form.carrera.id_for_label }}">{{ form.carrera.label }}</label>
+            {{ form.carrera }}
+            {% if form.carrera.errors %}
+                <ul>
+                    {% for error in form.carrera.errors %}
+                        <li>{{ error }}</li>
+                    {% endfor %}
+                </ul>
+            {% endif %}
+        </div>
+        
+        <div>
+            <label for="{{ form.año_ingreso.id_for_label }}">{{ form.año_ingreso.label }}</label>
+            {{ form.año_ingreso }}
+            {% if form.año_ingreso.errors %}
+                <ul>
+                    {% for error in form.año_ingreso.errors %}
+                        <li>{{ error }}</li>
+                    {% endfor %}
+                </ul>
+            {% endif %}
+            <small>Año en que ingresó a la institución</small>
+        </div>
+    </fieldset>
     
     {% if form.non_field_errors %}
         <div>
+            <strong>Errores del formulario:</strong>
             {% for error in form.non_field_errors %}
                 <p><strong>Error:</strong> {{ error }}</p>
             {% endfor %}
         </div>
     {% endif %}
     
-    <button type="submit">{% if object %}Actualizar{% else %}Crear{% endif %} Alumno</button>
-    <a href="{% url 'gestion_academica:alumno_list' %}">Cancelar</a>
+    <div>
+        <button type="submit">{% if object %}Actualizar{% else %}Crear{% endif %} Alumno</button>
+        <a href="{% url 'gestion_academica:alumno_list' %}">Cancelar</a>
+    </div>
 </form>
 
 {% if not object %}
 <hr>
-<p><strong>Nota:</strong> Al crear un alumno, se generará automáticamente un usuario con las siguientes características:</p>
-<ul>
-    <li>Email: El mismo email del alumno</li>
-    <li>Contraseña inicial: El DNI del alumno</li>
-    <li>Rol: Alumno</li>
-    <li>Deberá cambiar la contraseña en el primer acceso</li>
-</ul>
+<div>
+    <h3>Información sobre la creación de usuario</h3>
+    <p><strong>Al crear un alumno, se generará automáticamente un usuario con:</strong></p>
+    <ul>
+        <li><strong>Usuario:</strong> Email del alumno</li>
+        <li><strong>Contraseña inicial:</strong> DNI del alumno</li>
+        <li><strong>Rol:</strong> Alumno (grupo "Alumnos")</li>
+        <li><strong>Estado:</strong> Activo, deberá cambiar contraseña en primer acceso</li>
+    </ul>
+    <p><em>El alumno podrá acceder al sistema usando su email y DNI como contraseña inicial.</em></p>
+</div>
+{% endif %}
+
+{% if object %}
+<hr>
+<div>
+    <h3>Datos del Usuario Asociado</h3>
+    {% if object.usuario %}
+        <p><strong>Email de acceso:</strong> {{ object.usuario.email }}</p>
+        <p><strong>DNI:</strong> {{ object.usuario.username }}</p>
+        <p><strong>Grupos:</strong> 
+            {% for grupo in object.usuario.groups.all %}
+                {{ grupo.name }}{% if not forloop.last %}, {% endif %}
+            {% empty %}
+                Sin grupos asignados
+            {% endfor %}
+        </p>
+        <p><strong>Estado:</strong> {% if object.usuario.is_active %}Activo{% else %}Inactivo{% endif %}</p>
+    {% else %}
+        <p><em>Este alumno no tiene usuario asociado.</em></p>
+    {% endif %}
+</div>
 {% endif %}
 {% endblock %}

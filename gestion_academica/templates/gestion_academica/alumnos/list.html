@@ -17,7 +17,8 @@
                 <th>Email</th>
                 <th>Carrera</th>
                 <th>Año Ingreso</th>
-                <th>Estado</th>
+                <th>Estado Alumno</th>
+                <th>Usuario</th>
                 <th>Acciones</th>
             </tr>
         </thead>
@@ -32,8 +33,19 @@
                 <td>{{ alumno.año_ingreso }}</td>
                 <td>{% if alumno.activo %}Activo{% else %}Inactivo{% endif %}</td>
                 <td>
+                    {% if alumno.usuario %}
+                        {% if alumno.usuario.is_active %}✓ Activo{% else %}✗ Inactivo{% endif %}
+                    {% else %}
+                        <em>Sin usuario</em>
+                    {% endif %}
+                </td>
+                <td>
+                    <a href="{% url 'gestion_academica:alumno_detail' alumno.pk %}">Ver</a> |
                     <a href="{% url 'gestion_academica:alumno_update' alumno.pk %}">Editar</a> |
                     <a href="{% url 'gestion_academica:alumno_delete' alumno.pk %}">Eliminar</a>
+                    {% if alumno.usuario %}
+                        | <a href="{% url 'gestion_academica:usuario_update' alumno.usuario.pk %}">Editar Usuario</a>
+                    {% endif %}
                 </td>
             </tr>
             {% endfor %}
