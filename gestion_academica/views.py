@@ -1,35 +1,18 @@
-"""
-Vistas para el sistema de gestión académica.
-Implementa separación de capas y control de acceso por roles.
-"""
-
-from django.shortcuts import render, redirect, get_object_or_404
-from django.contrib.auth import login, logout
-from django.contrib.auth.decorators import login_required
-from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
+from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib import messages
-from django.urls import reverse_lazy, reverse
-from django.views.generic import (
-    View, TemplateView, ListView, CreateView, UpdateView, DeleteView, DetailView
-)
-from django.db.models import Q, Count
+from django.views.generic import TemplateView
 from django.core.exceptions import ValidationError
-from django.http import Http404
 
-from .models import Usuario, Carrera, Materia, Alumno, Inscripcion
-from .forms import (
-    LoginForm, CambiarPasswordForm, UsuarioForm,
-    MateriaForm, AlumnoForm, InscripcionForm, FiltroMateriaForm,
-    FiltroAlumnoMateriaForm
-)
-from .services import (
-    UsuarioService, MateriaService, 
-    AlumnoService, InscripcionService, ReportesService
-)
-# === DASHBOARD PRINCIPAL ===
+from carrera.models import Carrera
+from inscripcion.services import InscripcionService
+from materia.models import Materia
+from materia.services import MateriaService
+from usuario.views import AdminRequiredMixin
+
+from .services import ReportesService
+from .forms import FiltroMateriaForm
 
 class DashboardView(LoginRequiredMixin, TemplateView):
-    """Vista principal del dashboard según el grupo del usuario"""
     template_name = 'gestion_academica/dashboard.html'
     
     def get_context_data(self, **kwargs):
@@ -51,226 +34,7 @@ class DashboardView(LoginRequiredMixin, TemplateView):
         return context
 
 
-# === GESTIÓN DE ALUMNOS (Solo Admin) ===
-
-class AlumnoListView(AdminRequiredMixin, ListView):
-    """Lista todos los alumnos"""
-    model = Alumno
-    template_name = 'gestion_academica/alumnos/list.html'
-    context_object_name = 'alumnos'
-    paginate_by = 10
-    
-    def get_queryset(self):
-        return Alumno.objects.filter(activo=True).select_related('carrera', 'usuario').order_by('usuario__last_name', 'usuario__first_name')
-
-
-class AlumnoDetailView(AdminRequiredMixin, DetailView):
-    """Muestra los detalles de un alumno"""
-    model = Alumno
-    template_name = 'gestion_academica/alumnos/detail.html'
-    context_object_name = 'object'
-    
-    def get_queryset(self):
-        return Alumno.objects.select_related('carrera', 'usuario').prefetch_related(
-            'inscripciones__materia', 'usuario__groups'
-        )
-
-
-class AlumnoCreateView(AdminRequiredMixin, CreateView):
-    """Crea un nuevo alumno"""
-    model = Alumno
-    form_class = AlumnoForm
-    template_name = 'gestion_academica/alumnos/form.html'
-    success_url = reverse_lazy('alumno_list')
-    
-    def form_valid(self, form):
-        try:
-            response = super().form_valid(form)
-            messages.success(self.request, f'Alumno "{self.object.nombre_completo}" creado exitosamente.')
-            return response
-        except ValidationError as e:
-            messages.error(self.request, str(e))
-            return self.form_invalid(form)
-
-
-class AlumnoUpdateView(AdminRequiredMixin, UpdateView):
-    """Edita un alumno existente"""
-    model = Alumno
-    form_class = AlumnoForm
-    template_name = 'gestion_academica/alumnos/form.html'
-    success_url = reverse_lazy('alumno_list')
-    
-    def form_valid(self, form):
-        try:
-            response = super().form_valid(form)
-            messages.success(self.request, f'Alumno "{self.object.nombre_completo}" actualizado exitosamente.')
-            return response
-        except ValidationError as e:
-            messages.error(self.request, str(e))
-            return self.form_invalid(form)
-
-
-class AlumnoDeleteView(AdminRequiredMixin, DeleteView):
-    """Elimina un alumno"""
-    model = Alumno
-    template_name = 'gestion_academica/alumnos/confirm_delete.html'
-    success_url = reverse_lazy('alumno_list')
-    
-    def delete(self, request, *args, **kwargs):
-        try:
-            alumno = self.get_object()
-            nombre = alumno.nombre_completo
-            alumno.delete()
-            messages.success(request, f'Alumno "{nombre}" eliminado exitosamente.')
-            return redirect(self.success_url)
-        except ValidationError as e:
-            messages.error(request, str(e))
-            return redirect('alumno_list')
-
-
-# === GESTIÓN DE USUARIOS (Solo Admin) ===
-
-class UsuarioListView(AdminRequiredMixin, ListView):
-    """Lista todos los usuarios"""
-    model = Usuario
-    template_name = 'gestion_academica/usuarios/list.html'
-    context_object_name = 'usuarios'
-    paginate_by = 10
-    
-    def get_queryset(self):
-        return Usuario.objects.filter(is_active=True).order_by('last_name', 'first_name')
-
-
-class UsuarioCreateView(AdminRequiredMixin, CreateView):
-    """Crea un nuevo usuario"""
-    model = Usuario
-    form_class = UsuarioForm
-    template_name = 'gestion_academica/usuarios/form.html'
-    success_url = reverse_lazy('usuario_list')
-    
-    def form_valid(self, form):
-        try:
-            response = super().form_valid(form)
-            messages.success(self.request, f'Usuario "{self.object.get_full_name()}" creado exitosamente.')
-            return response
-        except ValidationError as e:
-            messages.error(self.request, str(e))
-            return self.form_invalid(form)
-
-
-class UsuarioUpdateView(AdminRequiredMixin, UpdateView):
-    """Edita un usuario existente"""
-    model = Usuario
-    form_class = UsuarioForm
-    template_name = 'gestion_academica/usuarios/form.html'
-    success_url = reverse_lazy('usuario_list')
-    
-    def form_valid(self, form):
-        try:
-            response = super().form_valid(form)
-            messages.success(self.request, f'Usuario "{self.object.get_full_name()}" actualizado exitosamente.')
-            return response
-        except ValidationError as e:
-            messages.error(self.request, str(e))
-            return self.form_invalid(form)
-
-
-class UsuarioDeleteView(AdminRequiredMixin, DeleteView):
-    """Elimina un usuario"""
-    model = Usuario
-    template_name = 'gestion_academica/usuarios/confirm_delete.html'
-    success_url = reverse_lazy('usuario_list')
-    
-    def delete(self, request, *args, **kwargs):
-        try:
-            usuario = self.get_object()
-            nombre = usuario.get_full_name()
-            usuario.delete()
-            messages.success(request, f'Usuario "{nombre}" eliminado exitosamente.')
-            return redirect(self.success_url)
-        except ValidationError as e:
-            messages.error(request, str(e))
-            return redirect('usuario_list')
-
-
-# === GESTIÓN DE INSCRIPCIONES ===
-
-class InscripcionListView(AdminRequiredMixin, ListView):
-    """Lista todas las inscripciones"""
-    model = Inscripcion
-    template_name = 'gestion_academica/inscripciones/list.html'
-    context_object_name = 'inscripciones'
-    paginate_by = 10
-    
-    def get_queryset(self):
-        return Inscripcion.objects.filter(activa=True).select_related('alumno', 'materia').order_by('-fecha_inscripcion')
-
-
-class InscripcionCreateView(AdminRequiredMixin, CreateView):
-    """Crea una nueva inscripción"""
-    model = Inscripcion
-    form_class = InscripcionForm
-    template_name = 'gestion_academica/inscripciones/form.html'
-    success_url = reverse_lazy('inscripcion_list')
-    
-    def form_valid(self, form):
-        try:
-            response = super().form_valid(form)
-            messages.success(self.request, f'Inscripción creada exitosamente.')
-            return response
-        except ValidationError as e:
-            messages.error(self.request, str(e))
-            return self.form_invalid(form)
-
-
-class InscripcionBajaView(AdminRequiredMixin, View):
-    """Da de baja una inscripción"""
-    def post(self, request, pk):
-        try:
-            inscripcion = InscripcionService.dar_de_baja_inscripcion(pk)
-            messages.success(request, f'Inscripción dada de baja exitosamente.')
-        except ValidationError as e:
-            messages.error(request, str(e))
-        
-        return redirect('inscripcion_list')
-
-
-# === VISTAS ESPECÍFICAS PARA ALUMNOS ===
-
-class MisMateriaView(AlumnoRequiredMixin, TemplateView):
-    """Vista para que el alumno vea sus materias"""
-    template_name = 'gestion_academica/alumno/mis_materias.html'
-    
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        try:
-            alumno = self.request.user.alumno
-            context['alumno'] = alumno
-            context['inscripciones'] = InscripcionService.obtener_inscripciones_alumno(alumno.id)
-        except:
-            messages.error(self.request, 'No se encontró información del alumno.')
-        
-        return context
-
-class InscribirseView(AlumnoRequiredMixin, View):
-    """Vista para que el alumno se inscriba a una materia"""
-    def post(self, request, materia_id):
-        try:
-            alumno = request.user.alumno
-            inscripcion = InscripcionService.inscribir_alumno(alumno.id, materia_id)
-            messages.success(request, f'Te has inscripto exitosamente a {inscripcion.materia.nombre}.')
-        except ValidationError as e:
-            messages.error(request, str(e))
-        except Exception as e:
-            messages.error(request, 'Error al procesar la inscripción.')
-        
-        return redirect('oferta_academica')
-
-
-# === VISTAS PARA INVITADOS ===
-
 class CarrerasPublicasView(TemplateView):
-    """Vista pública de carreras (para invitados)"""
     template_name = 'gestion_academica/publico/carreras.html'
     
     def get_context_data(self, **kwargs):
@@ -280,13 +44,11 @@ class CarrerasPublicasView(TemplateView):
 
 
 class MateriasPublicasView(TemplateView):
-    """Vista pública de materias (para invitados)"""
     template_name = 'gestion_academica/publico/materias.html'
     
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         
-        # Filtro por carrera
         carrera_id = self.request.GET.get('carrera')
         materias = Materia.objects.filter(activa=True).select_related('carrera')
         
@@ -298,8 +60,27 @@ class MateriasPublicasView(TemplateView):
         
         return context
 
+
+class MateriasPorCarreraView(LoginRequiredMixin, TemplateView):
+    template_name = 'gestion_academica/filtros/materias_por_carrera.html'
+    
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        
+        carrera_id = self.request.GET.get('carrera')
+        context['filtro_form'] = FiltroMateriaForm(self.request.GET or None)
+        
+        if carrera_id:
+            try:
+                context['materias'] = MateriaService.obtener_materias_por_carrera(carrera_id)
+                context['carrera_seleccionada'] = Carrera.objects.get(id=carrera_id)
+            except ValidationError as e:
+                messages.error(self.request, str(e))
+        
+        return context
+
+
 class AlumnosPorMateriaView(LoginRequiredMixin, TemplateView):
-    """Vista para ver alumnos inscritos en una materia"""
     template_name = 'gestion_academica/filtros/alumnos_por_materia.html'
     
     def get_context_data(self, **kwargs):
@@ -314,17 +95,21 @@ class AlumnosPorMateriaView(LoginRequiredMixin, TemplateView):
             except ValidationError as e:
                 messages.error(self.request, str(e))
         
-        # Formulario para seleccionar materia
         context['materias'] = Materia.objects.filter(activa=True).select_related('carrera')
         
         return context
 
 
+class MateriasConCupoView(LoginRequiredMixin, TemplateView):
+    template_name = 'gestion_academica/filtros/materias_con_cupo.html'
+    
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['materias'] = MateriaService.obtener_materias_con_cupo()
+        return context
 
-# === REPORTES ===
 
 class ReportesView(AdminRequiredMixin, TemplateView):
-    """Vista de reportes generales"""
     template_name = 'gestion_academica/reportes/general.html'
     
     def get_context_data(self, **kwargs):
