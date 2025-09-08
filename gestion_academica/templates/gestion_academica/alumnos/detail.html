@@ -131,11 +131,11 @@
 
 <hr>
 <div>
-    <a href="{% url 'gestion_academica:alumno_update' object.pk %}">Editar Alumno</a> |
-    <a href="{% url 'gestion_academica:alumno_delete' object.pk %}">Eliminar Alumno</a> |
+    <a href="{% url 'alumno_update' object.pk %}">Editar Alumno</a> |
+    <a href="{% url 'alumno_delete' object.pk %}">Eliminar Alumno</a> |
     {% if object.usuario %}
-        <a href="{% url 'gestion_academica:usuario_update' object.usuario.pk %}">Editar Usuario</a> |
+        <a href="{% url 'usuario_update' object.usuario.pk %}">Editar Usuario</a> |
     {% endif %}
-    <a href="{% url 'gestion_academica:alumno_list' %}">Volver a Lista</a>
+    <a href="{% url 'alumno_list' %}">Volver a Lista</a>
 </div>
 {% endblock %}

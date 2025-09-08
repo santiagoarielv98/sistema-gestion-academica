@@ -19,7 +19,7 @@
                 {% endif %}
                 <p><strong>Estado:</strong> {% if carrera.activa %}Activa{% else %}No disponible{% endif %}</p>
                 
-                <p><a href="{% url 'gestion_academica:materias_publicas' %}?carrera={{ carrera.id }}">Ver Materias de esta Carrera</a></p>
+                <p><a href="{% url 'materias_publicas' %}?carrera={{ carrera.id }}">Ver Materias de esta Carrera</a></p>
             </div>
         {% endfor %}
     </div>
@@ -30,7 +30,7 @@
 <hr>
 <h3>Más Información</h3>
 <ul>
-    <li><a href="{% url 'gestion_academica:materias_publicas' %}">Ver Todas las Materias</a></li>
-    <li><a href="{% url 'gestion_academica:materias_por_carrera' %}">Consultas por Carrera</a></li>
+    <li><a href="{% url 'materias_publicas' %}">Ver Todas las Materias</a></li>
+    <li><a href="{% url 'materias_por_carrera' %}">Consultas por Carrera</a></li>
 </ul>
 {% endblock %}

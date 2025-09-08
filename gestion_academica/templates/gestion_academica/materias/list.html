@@ -5,7 +5,7 @@
 {% block content %}
 <h1>Gestión de Materias</h1>
 
-<p><a href="{% url 'gestion_academica:materia_create' %}">Crear Nueva Materia</a></p>
+<p><a href="{% url 'materia_create' %}">Crear Nueva Materia</a></p>
 
 <!-- Filtro por carrera -->
 <form method="get">
@@ -13,7 +13,7 @@
         <label for="{{ filtro_form.carrera.id_for_label }}">{{ filtro_form.carrera.label }}</label>
         {{ filtro_form.carrera }}
         <button type="submit">Filtrar</button>
-        <a href="{% url 'gestion_academica:materia_list' %}">Limpiar Filtro</a>
+        <a href="{% url 'materia_list' %}">Limpiar Filtro</a>
     </div>
 </form>
 
@@ -44,8 +44,8 @@
                 <td>{{ materia.cupo_disponible }}</td>
                 <td>{% if materia.activa %}Activa{% else %}Inactiva{% endif %}</td>
                 <td>
-                    <a href="{% url 'gestion_academica:materia_update' materia.pk %}">Editar</a> |
-                    <a href="{% url 'gestion_academica:materia_delete' materia.pk %}">Eliminar</a>
+                    <a href="{% url 'materia_update' materia.pk %}">Editar</a> |
+                    <a href="{% url 'materia_delete' materia.pk %}">Eliminar</a>
                 </td>
             </tr>
             {% endfor %}

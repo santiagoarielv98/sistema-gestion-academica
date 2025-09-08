@@ -45,7 +45,7 @@
                     </td>
                     <td>
                         {% if materia.id not in materias_inscripto and materia.tiene_cupo %}
-                            <form method="post" action="{% url 'gestion_academica:inscribirse' materia.id %}" style="display: inline;">
+                            <form method="post" action="{% url 'inscribirse' materia.id %}" style="display: inline;">
                                 {% csrf_token %}
                                 <button type="submit" onclick="return confirm('¿Estás seguro de inscribirte a {{ materia.nombre }}?')">Inscribirme</button>
                             </form>
@@ -64,7 +64,7 @@
     {% endif %}
 
     <hr>
-    <p><a href="{% url 'gestion_academica:mis_materias' %}">Ver Mis Materias Actuales</a></p>
+    <p><a href="{% url 'mis_materias' %}">Ver Mis Materias Actuales</a></p>
 
 {% else %}
     <p>No se encontró información del alumno. Contacta al administrador.</p>

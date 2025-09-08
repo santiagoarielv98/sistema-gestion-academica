@@ -5,8 +5,6 @@ URLs para la aplicación de gestión académica
 from django.urls import path
 from . import views
 
-app_name = 'gestion_academica'
-
 urlpatterns = [
     # Autenticación
     path('login/', views.LoginView.as_view(), name='login'),

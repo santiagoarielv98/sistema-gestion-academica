@@ -25,6 +25,6 @@
 <form method="post">
     {% csrf_token %}
     <button type="submit">Sí, Eliminar Materia</button>
-    <a href="{% url 'gestion_academica:materia_list' %}">Cancelar</a>
+    <a href="{% url 'materia_list' %}">Cancelar</a>
 </form>
 {% endblock %}

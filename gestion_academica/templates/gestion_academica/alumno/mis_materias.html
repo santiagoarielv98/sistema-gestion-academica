@@ -37,7 +37,7 @@
                     <td>{{ inscripcion.materia.get_cuatrimestre_display }}</td>
                     <td>{{ inscripcion.fecha_inscripcion|date:"d/m/Y" }}</td>
                     <td>
-                        <form method="post" action="{% url 'gestion_academica:inscripcion_baja' inscripcion.pk %}" style="display: inline;">
+                        <form method="post" action="{% url 'inscripcion_baja' inscripcion.pk %}" style="display: inline;">
                             {% csrf_token %}
                             <button type="submit" onclick="return confirm('¿Estás seguro de darte de baja de esta materia?')">Darme de Baja</button>
                         </form>
@@ -51,7 +51,7 @@
     {% endif %}
 
     <hr>
-    <p><a href="{% url 'gestion_academica:oferta_academica' %}">Ver Oferta Académica e Inscribirme a Más Materias</a></p>
+    <p><a href="{% url 'oferta_academica' %}">Ver Oferta Académica e Inscribirme a Más Materias</a></p>
 
 {% else %}
     <p>No se encontró información del alumno. Contacta al administrador.</p>

@@ -14,53 +14,53 @@
     {% if user.rol == 'administrador' %}
         <h3>Panel de Administrador</h3>
         <ul>
-            <li><a href="{% url 'gestion_academica:carrera_list' %}">Gestionar Carreras</a></li>
-            <li><a href="{% url 'gestion_academica:materia_list' %}">Gestionar Materias</a></li>
-            <li><a href="{% url 'gestion_academica:alumno_list' %}">Gestionar Alumnos</a></li>
-            <li><a href="{% url 'gestion_academica:usuario_list' %}">Gestionar Usuarios</a></li>
-            <li><a href="{% url 'gestion_academica:inscripcion_list' %}">Gestionar Inscripciones</a></li>
+            <li><a href="{% url 'carrera_list' %}">Gestionar Carreras</a></li>
+            <li><a href="{% url 'materia_list' %}">Gestionar Materias</a></li>
+            <li><a href="{% url 'alumno_list' %}">Gestionar Alumnos</a></li>
+            <li><a href="{% url 'usuario_list' %}">Gestionar Usuarios</a></li>
+            <li><a href="{% url 'inscripcion_list' %}">Gestionar Inscripciones</a></li>
         </ul>
         
         <h4>Consultas y Reportes</h4>
         <ul>
-            <li><a href="{% url 'gestion_academica:materias_por_carrera' %}">Consultas por Carrera</a></li>
-            <li><a href="{% url 'gestion_academica:alumnos_por_materia' %}">Consultas por Materia</a></li>
-            <li><a href="{% url 'gestion_academica:materias_con_cupo' %}">Materias con Cupo Disponible</a></li>
+            <li><a href="{% url 'materias_por_carrera' %}">Consultas por Carrera</a></li>
+            <li><a href="{% url 'alumnos_por_materia' %}">Consultas por Materia</a></li>
+            <li><a href="{% url 'materias_con_cupo' %}">Materias con Cupo Disponible</a></li>
         </ul>
 
     {% elif user.rol == 'alumno' %}
         <h3>Panel de Alumno</h3>
         <ul>
-            <li><a href="{% url 'gestion_academica:mis_materias' %}">Mis Materias</a></li>
-            <li><a href="{% url 'gestion_academica:oferta_academica' %}">Oferta Académica</a></li>
-            <li><a href="{% url 'gestion_academica:cambiar_password' %}">Cambiar Contraseña</a></li>
+            <li><a href="{% url 'mis_materias' %}">Mis Materias</a></li>
+            <li><a href="{% url 'oferta_academica' %}">Oferta Académica</a></li>
+            <li><a href="{% url 'cambiar_password' %}">Cambiar Contraseña</a></li>
         </ul>
         
         <h4>Información Pública</h4>
         <ul>
-            <li><a href="{% url 'gestion_academica:carreras_publicas' %}">Ver Carreras</a></li>
-            <li><a href="{% url 'gestion_academica:materias_publicas' %}">Ver Materias</a></li>
-            <li><a href="{% url 'gestion_academica:materias_con_cupo' %}">Materias con Cupo</a></li>
+            <li><a href="{% url 'carreras_publicas' %}">Ver Carreras</a></li>
+            <li><a href="{% url 'materias_publicas' %}">Ver Materias</a></li>
+            <li><a href="{% url 'materias_con_cupo' %}">Materias con Cupo</a></li>
         </ul>
     {% endif %}
 
     <hr>
-    <p><a href="{% url 'gestion_academica:logout' %}">Cerrar Sesión</a></p>
+    <p><a href="{% url 'logout' %}">Cerrar Sesión</a></p>
 
 {% else %}
     <h3>Información Pública</h3>
     <p>Como invitado, puedes consultar información general sobre nuestra oferta académica:</p>
     
     <ul>
-        <li><a href="{% url 'gestion_academica:carreras_publicas' %}">Carreras Disponibles</a></li>
-        <li><a href="{% url 'gestion_academica:materias_publicas' %}">Materias Disponibles</a></li>
-        <li><a href="{% url 'gestion_academica:materias_con_cupo' %}">Materias con Cupo Disponible</a></li>
-        <li><a href="{% url 'gestion_academica:consultas_carrera' %}">Consultas por Carrera</a></li>
-        <li><a href="{% url 'gestion_academica:consultas_materia' %}">Consultas por Materia</a></li>
+        <li><a href="{% url 'carreras_publicas' %}">Carreras Disponibles</a></li>
+        <li><a href="{% url 'materias_publicas' %}">Materias Disponibles</a></li>
+        <li><a href="{% url 'materias_con_cupo' %}">Materias con Cupo Disponible</a></li>
+        <li><a href="{% url 'consultas_carrera' %}">Consultas por Carrera</a></li>
+        <li><a href="{% url 'consultas_materia' %}">Consultas por Materia</a></li>
     </ul>
 
     <hr>
-    <p>¿Eres estudiante o administrador? <a href="{% url 'gestion_academica:login' %}">Inicia Sesión</a></p>
+    <p>¿Eres estudiante o administrador? <a href="{% url 'login' %}">Inicia Sesión</a></p>
 {% endif %}
 
 <hr>

@@ -37,7 +37,7 @@ class AdminRequiredMixin(UserPassesTestMixin):
     
     def handle_no_permission(self):
         messages.error(self.request, 'No tienes permisos para acceder a esta página.')
-        return redirect('gestion_academica:dashboard')
+        return redirect('dashboard')
 
 
 class AlumnoRequiredMixin(UserPassesTestMixin):
@@ -48,7 +48,7 @@ class AlumnoRequiredMixin(UserPassesTestMixin):
     
     def handle_no_permission(self):
         messages.error(self.request, 'No tienes permisos para acceder a esta página.')
-        return redirect('gestion_academica:dashboard')
+        return redirect('dashboard')
 
 
 # === VISTAS DE AUTENTICACIÓN ===
@@ -59,7 +59,7 @@ class LoginView(View):
     
     def get(self, request):
         if request.user.is_authenticated:
-            return redirect('gestion_academica:dashboard')
+            return redirect('dashboard')
         
         form = LoginForm()
         return render(request, self.template_name, {'form': form})
@@ -74,10 +74,10 @@ class LoginView(View):
             # Verificar si es primer login
             if user.primer_login:
                 messages.info(request, 'Debes cambiar tu contraseña en el primer acceso.')
-                return redirect('gestion_academica:cambiar_password')
+                return redirect('cambiar_password')
             
             messages.success(request, f'¡Bienvenido {user.first_name}!')
-            return redirect('gestion_academica:dashboard')
+            return redirect('dashboard')
         
         return render(request, self.template_name, {'form': form})
 
@@ -87,7 +87,7 @@ class LogoutView(View):
     def get(self, request):
         logout(request)
         messages.success(request, 'Has cerrado sesión correctamente.')
-        return redirect('gestion_academica:login')
+        return redirect('login')
 
 
 class CambiarPasswordView(LoginRequiredMixin, View):
@@ -96,21 +96,21 @@ class CambiarPasswordView(LoginRequiredMixin, View):
     
     def get(self, request):
         if not request.user.primer_login:
-            return redirect('gestion_academica:dashboard')
+            return redirect('dashboard')
         
         form = CambiarPasswordForm(user=request.user)
         return render(request, self.template_name, {'form': form})
     
     def post(self, request):
         if not request.user.primer_login:
-            return redirect('gestion_academica:dashboard')
+            return redirect('dashboard')
         
         form = CambiarPasswordForm(user=request.user, data=request.POST)
         
         if form.is_valid():
             form.save()
             messages.success(request, 'Contraseña cambiada exitosamente.')
-            return redirect('gestion_academica:dashboard')
+            return redirect('dashboard')
         
         return render(request, self.template_name, {'form': form})
 
@@ -158,7 +158,7 @@ class CarreraCreateView(AdminRequiredMixin, CreateView):
     model = Carrera
     form_class = CarreraForm
     template_name = 'gestion_academica/carreras/form.html'
-    success_url = reverse_lazy('gestion_academica:carrera_list')
+    success_url = reverse_lazy('carrera_list')
     
     def form_valid(self, form):
         try:
@@ -175,7 +175,7 @@ class CarreraUpdateView(AdminRequiredMixin, UpdateView):
     model = Carrera
     form_class = CarreraForm
     template_name = 'gestion_academica/carreras/form.html'
-    success_url = reverse_lazy('gestion_academica:carrera_list')
+    success_url = reverse_lazy('carrera_list')
     
     def form_valid(self, form):
         try:
@@ -191,7 +191,7 @@ class CarreraDeleteView(AdminRequiredMixin, DeleteView):
     """Elimina una carrera"""
     model = Carrera
     template_name = 'gestion_academica/carreras/confirm_delete.html'
-    success_url = reverse_lazy('gestion_academica:carrera_list')
+    success_url = reverse_lazy('carrera_list')
     
     def delete(self, request, *args, **kwargs):
         try:
@@ -201,7 +201,7 @@ class CarreraDeleteView(AdminRequiredMixin, DeleteView):
             return redirect(self.success_url)
         except ValidationError as e:
             messages.error(request, str(e))
-            return redirect('gestion_academica:carrera_list')
+            return redirect('carrera_list')
 
 
 # === GESTIÓN DE MATERIAS (Solo Admin) ===
@@ -234,7 +234,7 @@ class MateriaCreateView(AdminRequiredMixin, CreateView):
     model = Materia
     form_class = MateriaForm
     template_name = 'gestion_academica/materias/form.html'
-    success_url = reverse_lazy('gestion_academica:materia_list')
+    success_url = reverse_lazy('materia_list')
     
     def form_valid(self, form):
         try:
@@ -251,7 +251,7 @@ class MateriaUpdateView(AdminRequiredMixin, UpdateView):
     model = Materia
     form_class = MateriaForm
     template_name = 'gestion_academica/materias/form.html'
-    success_url = reverse_lazy('gestion_academica:materia_list')
+    success_url = reverse_lazy('materia_list')
     
     def form_valid(self, form):
         try:
@@ -267,7 +267,7 @@ class MateriaDeleteView(AdminRequiredMixin, DeleteView):
     """Elimina una materia"""
     model = Materia
     template_name = 'gestion_academica/materias/confirm_delete.html'
-    success_url = reverse_lazy('gestion_academica:materia_list')
+    success_url = reverse_lazy('materia_list')
     
     def delete(self, request, *args, **kwargs):
         try:
@@ -277,7 +277,7 @@ class MateriaDeleteView(AdminRequiredMixin, DeleteView):
             return redirect(self.success_url)
         except ValidationError as e:
             messages.error(request, str(e))
-            return redirect('gestion_academica:materia_list')
+            return redirect('materia_list')
 
 
 # === GESTIÓN DE ALUMNOS (Solo Admin) ===
@@ -310,7 +310,7 @@ class AlumnoCreateView(AdminRequiredMixin, CreateView):
     model = Alumno
     form_class = AlumnoForm
     template_name = 'gestion_academica/alumnos/form.html'
-    success_url = reverse_lazy('gestion_academica:alumno_list')
+    success_url = reverse_lazy('alumno_list')
     
     def form_valid(self, form):
         try:
@@ -327,7 +327,7 @@ class AlumnoUpdateView(AdminRequiredMixin, UpdateView):
     model = Alumno
     form_class = AlumnoForm
     template_name = 'gestion_academica/alumnos/form.html'
-    success_url = reverse_lazy('gestion_academica:alumno_list')
+    success_url = reverse_lazy('alumno_list')
     
     def form_valid(self, form):
         try:
@@ -343,7 +343,7 @@ class AlumnoDeleteView(AdminRequiredMixin, DeleteView):
     """Elimina un alumno"""
     model = Alumno
     template_name = 'gestion_academica/alumnos/confirm_delete.html'
-    success_url = reverse_lazy('gestion_academica:alumno_list')
+    success_url = reverse_lazy('alumno_list')
     
     def delete(self, request, *args, **kwargs):
         try:
@@ -354,7 +354,7 @@ class AlumnoDeleteView(AdminRequiredMixin, DeleteView):
             return redirect(self.success_url)
         except ValidationError as e:
             messages.error(request, str(e))
-            return redirect('gestion_academica:alumno_list')
+            return redirect('alumno_list')
 
 
 # === GESTIÓN DE USUARIOS (Solo Admin) ===
@@ -375,7 +375,7 @@ class UsuarioCreateView(AdminRequiredMixin, CreateView):
     model = Usuario
     form_class = UsuarioForm
     template_name = 'gestion_academica/usuarios/form.html'
-    success_url = reverse_lazy('gestion_academica:usuario_list')
+    success_url = reverse_lazy('usuario_list')
     
     def form_valid(self, form):
         try:
@@ -392,7 +392,7 @@ class UsuarioUpdateView(AdminRequiredMixin, UpdateView):
     model = Usuario
     form_class = UsuarioForm
     template_name = 'gestion_academica/usuarios/form.html'
-    success_url = reverse_lazy('gestion_academica:usuario_list')
+    success_url = reverse_lazy('usuario_list')
     
     def form_valid(self, form):
         try:
@@ -408,7 +408,7 @@ class UsuarioDeleteView(AdminRequiredMixin, DeleteView):
     """Elimina un usuario"""
     model = Usuario
     template_name = 'gestion_academica/usuarios/confirm_delete.html'
-    success_url = reverse_lazy('gestion_academica:usuario_list')
+    success_url = reverse_lazy('usuario_list')
     
     def delete(self, request, *args, **kwargs):
         try:
@@ -419,7 +419,7 @@ class UsuarioDeleteView(AdminRequiredMixin, DeleteView):
             return redirect(self.success_url)
         except ValidationError as e:
             messages.error(request, str(e))
-            return redirect('gestion_academica:usuario_list')
+            return redirect('usuario_list')
 
 
 # === GESTIÓN DE INSCRIPCIONES ===
@@ -440,7 +440,7 @@ class InscripcionCreateView(AdminRequiredMixin, CreateView):
     model = Inscripcion
     form_class = InscripcionForm
     template_name = 'gestion_academica/inscripciones/form.html'
-    success_url = reverse_lazy('gestion_academica:inscripcion_list')
+    success_url = reverse_lazy('inscripcion_list')
     
     def form_valid(self, form):
         try:
@@ -461,7 +461,7 @@ class InscripcionBajaView(AdminRequiredMixin, View):
         except ValidationError as e:
             messages.error(request, str(e))
         
-        return redirect('gestion_academica:inscripcion_list')
+        return redirect('inscripcion_list')
 
 
 # === VISTAS ESPECÍFICAS PARA ALUMNOS ===
@@ -515,7 +515,7 @@ class InscribirseView(AlumnoRequiredMixin, View):
         except Exception as e:
             messages.error(request, 'Error al procesar la inscripción.')
         
-        return redirect('gestion_academica:oferta_academica')
+        return redirect('oferta_academica')
 
 
 # === VISTAS PARA INVITADOS ===

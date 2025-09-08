@@ -5,7 +5,7 @@
 {% block content %}
 <h1>Gestión de Inscripciones</h1>
 
-<p><a href="{% url 'gestion_academica:inscripcion_create' %}">Crear Nueva Inscripción</a></p>
+<p><a href="{% url 'inscripcion_create' %}">Crear Nueva Inscripción</a></p>
 
 {% if inscripciones %}
     <table border="1">
@@ -31,7 +31,7 @@
                 <td>{{ inscripcion.observaciones|default:"Sin observaciones" }}</td>
                 <td>
                     {% if inscripcion.activa %}
-                        <form method="post" action="{% url 'gestion_academica:inscripcion_baja' inscripcion.pk %}" style="display: inline;">
+                        <form method="post" action="{% url 'inscripcion_baja' inscripcion.pk %}" style="display: inline;">
                             {% csrf_token %}
                             <button type="submit" onclick="return confirm('¿Estás seguro de dar de baja esta inscripción?')">Dar de Baja</button>
                         </form>

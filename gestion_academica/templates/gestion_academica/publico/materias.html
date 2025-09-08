@@ -13,7 +13,7 @@
         <label for="{{ filtro_form.carrera.id_for_label }}">{{ filtro_form.carrera.label }}</label>
         {{ filtro_form.carrera }}
         <button type="submit">Filtrar</button>
-        <a href="{% url 'gestion_academica:materias_publicas' %}">Ver Todas</a>
+        <a href="{% url 'materias_publicas' %}">Ver Todas</a>
     </div>
 </form>
 
@@ -51,7 +51,7 @@
 <hr>
 <h3>Enlaces Relacionados</h3>
 <ul>
-    <li><a href="{% url 'gestion_academica:carreras_publicas' %}">Ver Carreras Disponibles</a></li>
-    <li><a href="{% url 'gestion_academica:materias_con_cupo' %}">Ver Materias con Cupo Disponible</a></li>
+    <li><a href="{% url 'carreras_publicas' %}">Ver Carreras Disponibles</a></li>
+    <li><a href="{% url 'materias_con_cupo' %}">Ver Materias con Cupo Disponible</a></li>
 </ul>
 {% endblock %}

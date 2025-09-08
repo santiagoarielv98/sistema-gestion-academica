@@ -5,7 +5,7 @@
 {% block content %}
 <h1>Gestión de Alumnos</h1>
 
-<p><a href="{% url 'gestion_academica:alumno_create' %}">Crear Nuevo Alumno</a></p>
+<p><a href="{% url 'alumno_create' %}">Crear Nuevo Alumno</a></p>
 
 {% if alumnos %}
     <table border="1">
@@ -40,11 +40,11 @@
                     {% endif %}
                 </td>
                 <td>
-                    <a href="{% url 'gestion_academica:alumno_detail' alumno.pk %}">Ver</a> |
-                    <a href="{% url 'gestion_academica:alumno_update' alumno.pk %}">Editar</a> |
-                    <a href="{% url 'gestion_academica:alumno_delete' alumno.pk %}">Eliminar</a>
+                    <a href="{% url 'alumno_detail' alumno.pk %}">Ver</a> |
+                    <a href="{% url 'alumno_update' alumno.pk %}">Editar</a> |
+                    <a href="{% url 'alumno_delete' alumno.pk %}">Eliminar</a>
                     {% if alumno.usuario %}
-                        | <a href="{% url 'gestion_academica:usuario_update' alumno.usuario.pk %}">Editar Usuario</a>
+                        | <a href="{% url 'usuario_update' alumno.usuario.pk %}">Editar Usuario</a>
                     {% endif %}
                 </td>
             </tr>

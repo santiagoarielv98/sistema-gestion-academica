@@ -5,7 +5,7 @@
 {% block content %}
 <h1>Gestión de Carreras</h1>
 
-<p><a href="{% url 'gestion_academica:carrera_create' %}">Crear Nueva Carrera</a></p>
+<p><a href="{% url 'carrera_create' %}">Crear Nueva Carrera</a></p>
 
 {% if carreras %}
     <table border="1">
@@ -26,8 +26,8 @@
                 <td>{{ carrera.duracion_años }}</td>
                 <td>{% if carrera.activa %}Activa{% else %}Inactiva{% endif %}</td>
                 <td>
-                    <a href="{% url 'gestion_academica:carrera_update' carrera.pk %}">Editar</a> |
-                    <a href="{% url 'gestion_academica:carrera_delete' carrera.pk %}">Eliminar</a>
+                    <a href="{% url 'carrera_update' carrera.pk %}">Editar</a> |
+                    <a href="{% url 'carrera_delete' carrera.pk %}">Eliminar</a>
                 </td>
             </tr>
             {% endfor %}

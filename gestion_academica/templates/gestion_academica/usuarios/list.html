@@ -5,7 +5,7 @@
 {% block content %}
 <h1>Gestión de Usuarios</h1>
 
-<p><a href="{% url 'gestion_academica:usuario_create' %}">Crear Nuevo Usuario</a></p>
+<p><a href="{% url 'usuario_create' %}">Crear Nuevo Usuario</a></p>
 
 {% if usuarios %}
     <table border="1">
@@ -30,8 +30,8 @@
                 <td>{% if usuario.primer_login %}Pendiente{% else %}Completado{% endif %}</td>
                 <td>{% if usuario.is_active %}Activo{% else %}Inactivo{% endif %}</td>
                 <td>
-                    <a href="{% url 'gestion_academica:usuario_update' usuario.pk %}">Editar</a> |
-                    <a href="{% url 'gestion_academica:usuario_delete' usuario.pk %}">Eliminar</a>
+                    <a href="{% url 'usuario_update' usuario.pk %}">Editar</a> |
+                    <a href="{% url 'usuario_delete' usuario.pk %}">Eliminar</a>
                 </td>
             </tr>
             {% endfor %}

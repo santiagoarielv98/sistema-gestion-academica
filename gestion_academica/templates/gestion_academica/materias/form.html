@@ -103,6 +103,6 @@
     {% endif %}
     
     <button type="submit">{% if object %}Actualizar{% else %}Crear{% endif %} Materia</button>
-    <a href="{% url 'gestion_academica:materia_list' %}">Cancelar</a>
+    <a href="{% url 'materia_list' %}">Cancelar</a>
 </form>
 {% endblock %}

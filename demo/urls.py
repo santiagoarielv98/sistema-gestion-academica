@@ -19,9 +19,10 @@ from django.urls import path, include
 from django.shortcuts import redirect
 
 def redirect_to_dashboard(request):
-    return redirect('gestion_academica:dashboard')
+    return redirect('dashboard')
 
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('', include('gestion_academica.urls')),
+    path('', include('usuarios.urls')),
 ]

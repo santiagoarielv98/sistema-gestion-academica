@@ -27,6 +27,6 @@
 <form method="post">
     {% csrf_token %}
     <button type="submit">Sí, Eliminar Usuario</button>
-    <a href="{% url 'gestion_academica:usuario_list' %}">Cancelar</a>
+    <a href="{% url 'usuario_list' %}">Cancelar</a>
 </form>
 {% endblock %}
