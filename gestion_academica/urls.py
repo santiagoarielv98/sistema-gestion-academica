@@ -9,24 +9,6 @@ urlpatterns = [
     # Página principal
     path('', views.DashboardView.as_view(), name='dashboard'),
     
-    # Gestión de Materias (solo Admin)
-    path('materias/', views.MateriaListView.as_view(), name='materia_list'),
-    path('materias/crear/', views.MateriaCreateView.as_view(), name='materia_create'),
-    path('materias/<int:pk>/editar/', views.MateriaUpdateView.as_view(), name='materia_update'),
-    path('materias/<int:pk>/eliminar/', views.MateriaDeleteView.as_view(), name='materia_delete'),
-    
-    # Gestión de Alumnos (solo Admin)
-    path('alumnos/', views.AlumnoListView.as_view(), name='alumno_list'),
-    path('alumnos/crear/', views.AlumnoCreateView.as_view(), name='alumno_create'),
-    path('alumnos/<int:pk>/', views.AlumnoDetailView.as_view(), name='alumno_detail'),
-    path('alumnos/<int:pk>/editar/', views.AlumnoUpdateView.as_view(), name='alumno_update'),
-    path('alumnos/<int:pk>/eliminar/', views.AlumnoDeleteView.as_view(), name='alumno_delete'),
-    
-    # Gestión de Inscripciones
-    path('inscripciones/', views.InscripcionListView.as_view(), name='inscripcion_list'),
-    path('inscripciones/crear/', views.InscripcionCreateView.as_view(), name='inscripcion_create'),
-    path('inscripciones/<int:pk>/dar-baja/', views.InscripcionBajaView.as_view(), name='inscripcion_baja'),
-    
     # Vistas específicas para alumnos
     path('mis-materias/', views.MisMateriaView.as_view(), name='mis_materias'),
     path('oferta-academica/', views.OfertaAcademicaView.as_view(), name='oferta_academica'),
