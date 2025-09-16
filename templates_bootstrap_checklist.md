@@ -21,16 +21,23 @@
 - [x] **usuarios/confirm_delete.html** - Confirmación con warnings específicos por rol, info detallada
 - [x] **inscripciones/list.html** - Lista CRUD con tabla responsive, stats cards, estados de inscripción
 - [x] **inscripciones/form.html** - Formulario con selects estilizados, validaciones, panel informativo
+- [x] **alumno/oferta_academica.html** - Vista de materias disponibles con stats, progress bars, inscripción
+- [x] **alumno/mis_materias.html** - Panel de materias inscriptas con info del alumno, acciones
+- [x] **auth/cambiar_password.html** - Formulario de cambio de contraseña con diseño moderno y toggle de visibilidad
+- [x] **auth/login.html** - Página de login con card centrada, información del sistema y funcionalidades
+- [x] **publico/consultas_carrera.html** - Consultas por carrera con filtros, stats y tabla responsive
+- [x] **publico/consultas_materia.html** - Consultas por materia con info detallada y lista de alumnos
+- [x] **publico/materias_con_cupo.html** - Materias disponibles con stats, progress bars y alertas
 
-## 📋 Pendientes de Estilizar:
-- [ ] **alumno/oferta_academica.html** - Oferta académica disponible
+## 📋 Completamente Terminado ✅
 
-### 📊 **Templates de Reportes:**
-- [ ] **reportes/general.html** - Reportes generales del sistema
+🎉 **¡Todos los templates principales han sido estilizados con Bootstrap!**
 
-### 🔍 **Templates de Filtros/Consultas:**
-- [ ] **filtros/materias_con_cupo.html** - Consulta de materias con cupo
-- [ ] **filtros/materias_por_carrera.html** - Materias filtradas por carrera
+### 📊 **Templates de Reportes (Opcionales):**
+- [ ] **reportes/general.html** - Reportes generales del sistema (si existe)
+
+### 🔍 **Templates de Filtros/Consultas Adicionales (Opcionales):**
+- [ ] **filtros/otros.html** - Otros filtros específicos (si existen)
 
 ---
 

@@ -1,5 +1,5 @@
 from django.shortcuts import redirect, render
-from django.contrib.auth.mixins import UserPassesTestMixin
+from django.contrib.auth.mixins import UserPassesTestMixin, LoginRequiredMixin
 from django.contrib import messages
 from django.urls import reverse_lazy
 from django.views import View
@@ -72,7 +72,7 @@ class LogoutView(View):
         return redirect('login')
 
 
-class CambiarPasswordView(AdminRequiredMixin, View):
+class CambiarPasswordView(LoginRequiredMixin, View):
     """Vista para cambiar contraseña en primer login"""
     template_name = 'gestion_academica/auth/cambiar_password.html'
     
