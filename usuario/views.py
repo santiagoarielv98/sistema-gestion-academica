@@ -142,7 +142,7 @@ class UsuarioDeleteView(AdminRequiredMixin, DeleteView):
     template_name = 'gestion_academica/usuarios/confirm_delete.html'
     success_url = reverse_lazy('usuario_list')
     
-    def delete(self, request, *args, **kwargs):
+    def post(self, request, *args, **kwargs):
         try:
             usuario = self.get_object()
             nombre = usuario.get_full_name()
@@ -150,6 +150,6 @@ class UsuarioDeleteView(AdminRequiredMixin, DeleteView):
             messages.success(request, f'Usuario "{nombre}" eliminado exitosamente.')
             return redirect(self.success_url)
         except ValidationError as e:
-            messages.error(request, str(e))
+            messages.error(request, str(e.message), extra_tags='danger')
             return redirect('usuario_list')
 

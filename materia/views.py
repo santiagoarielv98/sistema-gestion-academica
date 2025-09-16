@@ -79,14 +79,14 @@ class MateriaDeleteView(AdminRequiredMixin, DeleteView):
     template_name = 'gestion_academica/materias/confirm_delete.html'
     success_url = reverse_lazy('materia_list')
     
-    def delete(self, request, *args, **kwargs):
+    def post(self, request, *args, **kwargs):
         try:
             materia = self.get_object()
             MateriaService.eliminar_materia(materia.id)
             messages.success(request, f'Materia "{materia.nombre}" eliminada exitosamente.')
             return redirect(self.success_url)
         except ValidationError as e:
-            messages.error(request, str(e))
+            messages.error(request, str(e.message), extra_tags='danger')
             return redirect('materia_list')
 
 class MateriasPorCarreraView(LoginRequiredMixin, TemplateView):

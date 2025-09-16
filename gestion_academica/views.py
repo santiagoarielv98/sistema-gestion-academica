@@ -221,7 +221,7 @@ class InscribirseView(AlumnoRequiredMixin, View):
             inscripcion = InscripcionService.inscribir_alumno(alumno.id, materia_id)
             messages.success(request, f'Te has inscripto exitosamente a {inscripcion.materia.nombre}.')
         except ValidationError as e:
-            messages.error(request, str(e))
+            messages.error(request, str(e.message), extra_tags='danger')
         except Exception as e:
             messages.error(request, 'Error al procesar la inscripción.')
         

@@ -43,13 +43,13 @@ class InscripcionCreateView(AdminRequiredMixin, CreateView):
             return self.form_invalid(form)
 
 
-class InscripcionBajaView(AlumnoRequiredMixin, View):
+class InscripcionBajaView(AdminRequiredMixin, AlumnoRequiredMixin, View):
     """Da de baja una inscripción"""
     def post(self, request, pk):
         try:
             inscripcion = InscripcionService.dar_de_baja_inscripcion(pk)
             messages.success(request, f'Inscripción dada de baja exitosamente.')
         except ValidationError as e:
-            messages.error(request, str(e))
+            messages.error(request, str(e.message), extra_tags='danger')
         
         return redirect('inscripcion_list')
