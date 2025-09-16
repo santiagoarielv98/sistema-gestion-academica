@@ -6,7 +6,7 @@ from django.views.generic import (
 )
 from django.core.exceptions import ValidationError
 
-from usuario.views import AdminRequiredMixin
+from usuario.views import AdminRequiredMixin, AlumnoRequiredMixin
 
 from .models import Inscripcion
 from .forms import InscripcionForm
@@ -43,7 +43,7 @@ class InscripcionCreateView(AdminRequiredMixin, CreateView):
             return self.form_invalid(form)
 
 
-class InscripcionBajaView(AdminRequiredMixin, View):
+class InscripcionBajaView(AlumnoRequiredMixin, View):
     """Da de baja una inscripción"""
     def post(self, request, pk):
         try:
