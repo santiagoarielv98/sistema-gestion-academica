@@ -25,10 +25,10 @@ class DashboardView(LoginRequiredMixin, TemplateView):
         context['user'] = user
         
         if user.groups.filter(name='Administradores').exists():
-            context['reporte'] = ReportesService.reporte_general()
+            context['stats'] = ReportesService.reporte_general()
         elif user.groups.filter(name='Alumnos').exists():
             try:
-                alumno = user.alumno
+                alumno = user.perfil_alumno
                 context['alumno'] = alumno
                 context['inscripciones'] = InscripcionService.obtener_inscripciones_alumno(alumno.id)
             except:
@@ -128,7 +128,7 @@ class MisMateriaView(AlumnoRequiredMixin, TemplateView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         try:
-            alumno = self.request.user.alumno
+            alumno = self.request.user.perfil_alumno
             context['alumno'] = alumno
             context['inscripciones'] = InscripcionService.obtener_inscripciones_alumno(alumno.id)
         except:
@@ -144,7 +144,7 @@ class OfertaAcademicaView(AlumnoRequiredMixin, TemplateView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         try:
-            alumno = self.request.user.alumno
+            alumno = self.request.user.perfil_alumno
             context['alumno'] = alumno
             context['materias'] = MateriaService.obtener_materias_por_carrera(alumno.carrera.id)
             
@@ -162,7 +162,7 @@ class InscribirseView(AlumnoRequiredMixin, View):
     """Vista para que el alumno se inscriba a una materia"""
     def post(self, request, materia_id):
         try:
-            alumno = request.user.alumno
+            alumno = request.user.perfil_alumno
             inscripcion = InscripcionService.inscribir_alumno(alumno.id, materia_id)
             messages.success(request, f'Te has inscripto exitosamente a {inscripcion.materia.nombre}.')
         except ValidationError as e:
@@ -170,5 +170,5 @@ class InscribirseView(AlumnoRequiredMixin, View):
         except Exception as e:
             messages.error(request, 'Error al procesar la inscripción.')
         
-        return redirect('gestion_academica:oferta_academica')
+        return redirect('oferta_academica')
 

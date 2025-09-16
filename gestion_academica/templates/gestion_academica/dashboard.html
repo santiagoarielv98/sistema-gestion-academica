@@ -64,6 +64,8 @@
 {% endif %}
 
 <hr>
+
+{% if stats %}
 <h3>Estadísticas Generales</h3>
 <table border="1">
     <tr>
@@ -87,4 +89,6 @@
         <td>{{ stats.materias_con_cupo }}</td>
     </tr>
 </table>
+{% endif %}
+
 {% endblock %}

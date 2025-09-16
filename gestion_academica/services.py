@@ -25,7 +25,8 @@ class ReportesService:
             'total_carreras': Carrera.objects.filter(activa=True).count(),
             'total_materias': Materia.objects.filter(activa=True).count(),
             'total_alumnos': Alumno.objects.filter(activo=True).count(),
-            'total_inscripciones': Inscripcion.objects.filter(activa=True).count(),
+            'total_inscripciones': Inscripcion.objects.filter(activa=True).count(),     
+            'materias_con_cupo': Materia.objects.filter(activa=True).count(),
             'total_usuarios': Usuario.objects.filter(is_active=True).count(),
         }
     
