@@ -19,11 +19,10 @@
 - [x] **usuarios/list.html** - Lista CRUD con tabla de usuarios, roles, states, stats cards
 - [x] **usuarios/form.html** - Formulario con layout 2 columnas, info panels, validaciones
 - [x] **usuarios/confirm_delete.html** - Confirmación con warnings específicos por rol, info detallada
+- [x] **inscripciones/list.html** - Lista CRUD con tabla responsive, stats cards, estados de inscripción
+- [x] **inscripciones/form.html** - Formulario con selects estilizados, validaciones, panel informativo
 
 ## 📋 Pendientes de Estilizar:
-- [ ] **inscripciones/list.html** - Lista CRUD de inscripciones
-- [ ] **inscripciones/form.html** - Formulario de inscripción
-- [ ] **inscripciones/confirm_delete.html** - Confirmación de eliminación de inscripción
 - [ ] **alumno/oferta_academica.html** - Oferta académica disponible
 
 ### 📊 **Templates de Reportes:**
