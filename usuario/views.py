@@ -56,7 +56,7 @@ class LoginView(View):
             # Verificar si es primer login
             if user.primer_login:
                 messages.info(request, 'Debes cambiar tu contraseña en el primer acceso.')
-                return redirect('cambiar_password')
+                return redirect('cambiar_password_primer_login')
             
             messages.success(request, f'¡Bienvenido {user.first_name}!')
             return redirect('dashboard')
@@ -73,20 +73,14 @@ class LogoutView(View):
 
 
 class CambiarPasswordView(LoginRequiredMixin, View):
-    """Vista para cambiar contraseña en primer login"""
+    """Vista para cambiar contraseña (uso general)"""
     template_name = 'gestion_academica/auth/cambiar_password.html'
     
     def get(self, request):
-        if not request.user.primer_login:
-            return redirect('dashboard')
-        
         form = CambiarPasswordForm(user=request.user)
         return render(request, self.template_name, {'form': form})
     
     def post(self, request):
-        if not request.user.primer_login:
-            return redirect('dashboard')
-        
         form = CambiarPasswordForm(user=request.user, data=request.POST)
         
         if form.is_valid():

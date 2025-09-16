@@ -77,15 +77,15 @@
                     </div>
                     <div class="card-body">
                         <div class="list-group list-group-flush">
-                            <a href="{% url 'materias_por_carrera' %}" class="list-group-item list-group-item-action">
+                            <button disabled href="{% url 'materias_por_carrera' %}" class="list-group-item list-group-item-action">
                                 <i class="bi bi-search"></i> Consultas por Carrera
-                            </a>
-                            <a href="{% url 'alumnos_por_materia' %}" class="list-group-item list-group-item-action">
+                            </button>
+                            <button disabled class="list-group-item list-group-item-action">
                                 <i class="bi bi-search"></i> Consultas por Materia
-                            </a>
-                            <a href="{% url 'materias_con_cupo' %}" class="list-group-item list-group-item-action">
+                            </button>
+                            <button disabled class="list-group-item list-group-item-action">
                                 <i class="bi bi-check-circle"></i> Materias con Cupo Disponible
-                            </a>
+                            </button>
                         </div>
                     </div>
                 </div>
@@ -135,9 +135,9 @@
                             <a href="{% url 'materias_publicas' %}" class="list-group-item list-group-item-action">
                                 <i class="bi bi-eye"></i> Ver Materias
                             </a>
-                            <a href="{% url 'materias_con_cupo' %}" class="list-group-item list-group-item-action">
+                            <button disabled class="list-group-item list-group-item-action">
                                 <i class="bi bi-check-circle"></i> Materias con Cupo
-                            </a>
+                            </button>
                         </div>
                     </div>
                 </div>
@@ -178,9 +178,9 @@
                         <a href="{% url 'materias_publicas' %}" class="list-group-item list-group-item-action">
                             <i class="bi bi-journal-text"></i> Materias Disponibles
                         </a>
-                        <a href="{% url 'materias_con_cupo' %}" class="list-group-item list-group-item-action">
+                        <button disabled class="list-group-item list-group-item-action">
                             <i class="bi bi-check-circle"></i> Materias con Cupo Disponible
-                        </a>
+                        </button>
                         <a href="{% url 'consultas_carrera' %}" class="list-group-item list-group-item-action">
                             <i class="bi bi-search"></i> Consultas por Carrera
                         </a>

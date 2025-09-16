@@ -45,13 +45,14 @@ class DashboardView(LoginRequiredMixin, TemplateView):
         return context
 
 
-class CambiarPasswordPrimerLoginView(LoginRequiredMixin, View):
-    """Vista para cambiar contraseña en el primer login"""
+class CambiarPasswordPrimerLoginView(LoginRequiredMixin, AlumnoRequiredMixin, View):
+    """Vista para cambiar contraseña en el primer login (solo alumnos)"""
     template_name = 'gestion_academica/auth/cambiar_password_primer_login.html'
     
     def get(self, request):
         # Solo permitir si es primer login
         if not hasattr(request.user, 'primer_login') or not request.user.primer_login:
+            messages.info(request, 'Ya has cambiado tu contraseña previamente.')
             return redirect('dashboard')
             
         form = PasswordChangeForm(request.user)
@@ -60,6 +61,7 @@ class CambiarPasswordPrimerLoginView(LoginRequiredMixin, View):
     def post(self, request):
         # Solo permitir si es primer login
         if not hasattr(request.user, 'primer_login') or not request.user.primer_login:
+            messages.info(request, 'Ya has cambiado tu contraseña previamente.')
             return redirect('dashboard')
             
         form = PasswordChangeForm(request.user, request.POST)
@@ -72,7 +74,7 @@ class CambiarPasswordPrimerLoginView(LoginRequiredMixin, View):
             # Actualizar la sesión para que no se cierre
             update_session_auth_hash(request, user)
             
-            messages.success(request, 'Contraseña cambiada exitosamente. Ahora puedes acceder al sistema.')
+            messages.success(request, 'Contraseña cambiada exitosamente. ¡Bienvenido al sistema!')
             return redirect('dashboard')
         
         return render(request, self.template_name, {'form': form})
