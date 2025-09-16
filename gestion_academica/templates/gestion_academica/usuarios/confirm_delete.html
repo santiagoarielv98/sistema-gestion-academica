@@ -3,30 +3,227 @@
 {% block title %}Eliminar Usuario - Sistema Académico{% endblock %}
 
 {% block content %}
-<h1>Eliminar Usuario</h1>
-
-<p><strong>¿Estás seguro de que deseas eliminar al usuario "{{ object.get_full_name }}"?</strong></p>
-
-<div>
-    <h3>Información del Usuario:</h3>
-    <ul>
-        <li><strong>Nombre:</strong> {{ object.get_full_name }}</li>
-        <li><strong>DNI:</strong> {{ object.dni }}</li>
-        <li><strong>Email:</strong> {{ object.email }}</li>
-        <li><strong>Rol:</strong> {{ object.get_rol_display }}</li>
-        <li><strong>Estado:</strong> {% if object.is_active %}Activo{% else %}Inactivo{% endif %}</li>
-    </ul>
+<!-- Header Section -->
+<div class="row mb-4">
+    <div class="col-12 text-center">
+        <div class="mb-4">
+            <i class="bi bi-exclamation-triangle-fill text-danger" style="font-size: 4rem;"></i>
+        </div>
+        <h1 class="text-danger mb-2">Eliminar Usuario</h1>
+        <p class="lead text-muted">Esta acción requiere confirmación</p>
+    </div>
 </div>
 
-<p><strong>Advertencia:</strong> Esta acción no se puede deshacer.</p>
+<div class="row justify-content-center">
+    <div class="col-lg-8 col-xl-6">
+        <!-- Warning Alert -->
+        <div class="alert alert-danger border-danger" role="alert">
+            <div class="d-flex align-items-center mb-2">
+                <i class="bi bi-exclamation-triangle-fill me-2"></i>
+                <strong>¿Estás seguro de que deseas eliminar este usuario?</strong>
+            </div>
+            <hr>
+            <p class="mb-0">
+                <small>
+                    <i class="bi bi-info-circle"></i>
+                    Esta acción no se puede deshacer y puede afectar las relaciones existentes en el sistema.
+                </small>
+            </p>
+        </div>
 
-{% if object.rol == 'alumno' %}
-    <p><strong>Nota:</strong> Si este usuario está vinculado a un alumno, también se afectará la relación correspondiente.</p>
-{% endif %}
+        <!-- User Information Card -->
+        <div class="card mb-4">
+            <div class="card-header bg-light">
+                <h5 class="card-title mb-0">
+                    <i class="bi bi-person-badge"></i>
+                    Información del Usuario a Eliminar
+                </h5>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-12 mb-3">
+                        <div class="d-flex align-items-center">
+                            <i class="bi bi-person-circle text-primary me-2"></i>
+                            <div>
+                                <small class="text-muted">Nombre Completo</small>
+                                <p class="fw-bold mb-0">{{ object.get_full_name }}</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <div class="d-flex align-items-center">
+                            <i class="bi bi-person-vcard text-secondary me-2"></i>
+                            <div>
+                                <small class="text-muted">DNI</small>
+                                <p class="fw-bold mb-0">
+                                    <span class="badge bg-secondary">{{ object.dni }}</span>
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <div class="d-flex align-items-center">
+                            <i class="bi bi-envelope text-primary me-2"></i>
+                            <div>
+                                <small class="text-muted">Email</small>
+                                <p class="fw-bold mb-0">{{ object.email }}</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <div class="d-flex align-items-center">
+                            <i class="bi bi-shield-check text-warning me-2"></i>
+                            <div>
+                                <small class="text-muted">Rol</small>
+                                <p class="fw-bold mb-0">
+                                    {% if object.rol == 'administrador' %}
+                                        <span class="badge bg-warning text-dark">
+                                            <i class="bi bi-person-gear"></i>
+                                            {{ object.get_rol_display }}
+                                        </span>
+                                    {% elif object.rol == 'alumno' %}
+                                        <span class="badge bg-info">
+                                            <i class="bi bi-mortarboard"></i>
+                                            {{ object.get_rol_display }}
+                                        </span>
+                                    {% else %}
+                                        <span class="badge bg-secondary">
+                                            {{ object.get_rol_display }}
+                                        </span>
+                                    {% endif %}
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <div class="d-flex align-items-center">
+                            <i class="bi bi-toggle-on text-success me-2"></i>
+                            <div>
+                                <small class="text-muted">Estado</small>
+                                <p class="fw-bold mb-0">
+                                    {% if object.is_active %}
+                                        <span class="badge bg-success">
+                                            <i class="bi bi-person-check"></i>
+                                            Activo
+                                        </span>
+                                    {% else %}
+                                        <span class="badge bg-danger">
+                                            <i class="bi bi-person-x"></i>
+                                            Inactivo
+                                        </span>
+                                    {% endif %}
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <div class="d-flex align-items-center">
+                            <i class="bi bi-key text-info me-2"></i>
+                            <div>
+                                <small class="text-muted">Primer Login</small>
+                                <p class="fw-bold mb-0">
+                                    {% if object.primer_login %}
+                                        <span class="badge bg-warning text-dark">
+                                            <i class="bi bi-exclamation-triangle"></i>
+                                            Pendiente
+                                        </span>
+                                    {% else %}
+                                        <span class="badge bg-success">
+                                            <i class="bi bi-check-circle"></i>
+                                            Completado
+                                        </span>
+                                    {% endif %}
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <div class="d-flex align-items-center">
+                            <i class="bi bi-clock text-muted me-2"></i>
+                            <div>
+                                <small class="text-muted">Última conexión</small>
+                                <p class="fw-bold mb-0">
+                                    <small>{{ object.last_login|default:"Nunca" }}</small>
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
 
-<form method="post">
-    {% csrf_token %}
-    <button type="submit">Sí, Eliminar Usuario</button>
-    <a href="{% url 'usuario_list' %}">Cancelar</a>
-</form>
+        <!-- Role-Specific Warning -->
+        {% if object.rol == 'alumno' %}
+            <div class="alert alert-warning border-warning mb-4" role="alert">
+                <h6 class="alert-heading">
+                    <i class="bi bi-exclamation-diamond-fill"></i>
+                    Advertencia Especial - Usuario Alumno:
+                </h6>
+                <p class="mb-0">
+                    Si este usuario está vinculado a un perfil de alumno, también se afectará la relación correspondiente.
+                    Esto puede impactar inscripciones, historiales académicos y estadísticas del sistema.
+                </p>
+            </div>
+        {% elif object.rol == 'administrador' %}
+            <div class="alert alert-danger border-danger mb-4" role="alert">
+                <h6 class="alert-heading">
+                    <i class="bi bi-shield-exclamation"></i>
+                    Advertencia Crítica - Usuario Administrador:
+                </h6>
+                <p class="mb-0">
+                    Está eliminando un usuario administrador. Asegúrese de que existan otros administradores
+                    en el sistema para mantener el acceso de gestión.
+                </p>
+            </div>
+        {% endif %}
+
+        <!-- General Consequences Warning -->
+        <div class="alert alert-info border-info mb-4" role="alert">
+            <h6 class="alert-heading">
+                <i class="bi bi-info-circle-fill"></i>
+                Consecuencias de la Eliminación:
+            </h6>
+            <ul class="mb-0">
+                <li>No podrás recuperar este usuario una vez eliminado</li>
+                <li>Se perderán los datos de autenticación y perfil</li>
+                <li>Se eliminarán las sesiones activas del usuario</li>
+                <li>Los registros históricos se mantendrán por integridad referencial</li>
+                {% if object.rol == 'alumno' %}
+                    <li>Puede afectar las inscripciones y el historial académico</li>
+                {% endif %}
+            </ul>
+        </div>
+
+        <!-- Confirmation Form -->
+        <div class="card">
+            <div class="card-body">
+                <form method="post">
+                    {% csrf_token %}
+                    <div class="d-grid gap-2 d-md-flex justify-content-md-center">
+                        <a href="{% url 'usuario_list' %}" class="btn btn-success btn-lg me-md-3">
+                            <i class="bi bi-arrow-left"></i>
+                            No, Mantener Usuario
+                        </a>
+                        <button type="submit" class="btn btn-danger btn-lg">
+                            <i class="bi bi-person-x-fill"></i>
+                            Sí, Eliminar Definitivamente
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Additional Help -->
+<div class="row mt-5">
+    <div class="col-12">
+        <div class="text-center">
+            <small class="text-muted">
+                <i class="bi bi-question-circle"></i>
+                ¿Necesitas ayuda? Contacta al administrador del sistema.
+            </small>
+        </div>
+    </div>
+</div>
 {% endblock %}

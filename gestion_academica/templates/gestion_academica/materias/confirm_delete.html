@@ -3,28 +3,215 @@
 {% block title %}Eliminar Materia - Sistema Académico{% endblock %}
 
 {% block content %}
-<h1>Eliminar Materia</h1>
-
-<p><strong>¿Estás seguro de que deseas eliminar la materia "{{ object.nombre }}"?</strong></p>
-
-<div>
-    <h3>Información de la Materia:</h3>
-    <ul>
-        <li><strong>Nombre:</strong> {{ object.nombre }}</li>
-        <li><strong>Código:</strong> {{ object.codigo }}</li>
-        <li><strong>Carrera:</strong> {{ object.carrera.nombre }}</li>
-        <li><strong>Año:</strong> {{ object.año }}°</li>
-        <li><strong>Cuatrimestre:</strong> {{ object.get_cuatrimestre_display }}</li>
-        <li><strong>Cupo Máximo:</strong> {{ object.cupo_maximo }}</li>
-        <li><strong>Descripción:</strong> {{ object.descripcion|default:"Sin descripción" }}</li>
-    </ul>
+<!-- Header Section -->
+<div class="row mb-4">
+    <div class="col-12 text-center">
+        <div class="mb-4">
+            <i class="bi bi-exclamation-triangle-fill text-danger" style="font-size: 4rem;"></i>
+        </div>
+        <h1 class="text-danger mb-2">Eliminar Materia</h1>
+        <p class="lead text-muted">Esta acción requiere confirmación</p>
+    </div>
 </div>
 
-<p><strong>Advertencia:</strong> Esta acción no se puede deshacer. No podrás eliminar la materia si tiene inscripciones activas.</p>
+<div class="row justify-content-center">
+    <div class="col-lg-8 col-xl-6">
+        <!-- Warning Alert -->
+        <div class="alert alert-danger border-danger" role="alert">
+            <div class="d-flex align-items-center mb-2">
+                <i class="bi bi-exclamation-triangle-fill me-2"></i>
+                <strong>¿Estás seguro de que deseas eliminar esta materia?</strong>
+            </div>
+            <hr>
+            <p class="mb-0">
+                <small>
+                    <i class="bi bi-info-circle"></i>
+                    Esta acción no se puede deshacer y puede afectar las inscripciones existentes.
+                </small>
+            </p>
+        </div>
 
-<form method="post">
-    {% csrf_token %}
-    <button type="submit">Sí, Eliminar Materia</button>
-    <a href="{% url 'materia_list' %}">Cancelar</a>
-</form>
+        <!-- Materia Information Card -->
+        <div class="card mb-4">
+            <div class="card-header bg-light">
+                <h5 class="card-title mb-0">
+                    <i class="bi bi-journal-bookmark"></i>
+                    Información de la Materia a Eliminar
+                </h5>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-12 mb-3">
+                        <div class="d-flex align-items-center">
+                            <i class="bi bi-type text-primary me-2"></i>
+                            <div>
+                                <small class="text-muted">Nombre</small>
+                                <p class="fw-bold mb-0">{{ object.nombre }}</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <div class="d-flex align-items-center">
+                            <i class="bi bi-hash text-secondary me-2"></i>
+                            <div>
+                                <small class="text-muted">Código</small>
+                                <p class="fw-bold mb-0">
+                                    <span class="badge bg-secondary">{{ object.codigo }}</span>
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <div class="d-flex align-items-center">
+                            <i class="bi bi-mortarboard text-info me-2"></i>
+                            <div>
+                                <small class="text-muted">Carrera</small>
+                                <p class="fw-bold mb-0">{{ object.carrera.nombre }}</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-4 mb-3">
+                        <div class="d-flex align-items-center">
+                            <i class="bi bi-calendar-event text-primary me-2"></i>
+                            <div>
+                                <small class="text-muted">Año</small>
+                                <p class="fw-bold mb-0">
+                                    <span class="badge bg-info">{{ object.año }}° año</span>
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-4 mb-3">
+                        <div class="d-flex align-items-center">
+                            <i class="bi bi-calendar3 text-warning me-2"></i>
+                            <div>
+                                <small class="text-muted">Cuatrimestre</small>
+                                <p class="fw-bold mb-0">
+                                    <span class="badge bg-warning text-dark">{{ object.get_cuatrimestre_display }}</span>
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-4 mb-3">
+                        <div class="d-flex align-items-center">
+                            <i class="bi bi-people text-success me-2"></i>
+                            <div>
+                                <small class="text-muted">Cupo Máximo</small>
+                                <p class="fw-bold mb-0">
+                                    <span class="badge bg-success">{{ object.cupo_maximo }} estudiantes</span>
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <div class="d-flex align-items-center">
+                            <i class="bi bi-person-check text-primary me-2"></i>
+                            <div>
+                                <small class="text-muted">Cupo Disponible</small>
+                                <p class="fw-bold mb-0">
+                                    {% if object.cupo_disponible > 0 %}
+                                        <span class="badge bg-success">{{ object.cupo_disponible }} disponible</span>
+                                    {% else %}
+                                        <span class="badge bg-danger">Sin cupo</span>
+                                    {% endif %}
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <div class="d-flex align-items-center">
+                            <i class="bi bi-toggle-on text-success me-2"></i>
+                            <div>
+                                <small class="text-muted">Estado</small>
+                                <p class="fw-bold mb-0">
+                                    {% if object.activa %}
+                                        <span class="badge bg-success">Activa</span>
+                                    {% else %}
+                                        <span class="badge bg-danger">Inactiva</span>
+                                    {% endif %}
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                {% if object.descripcion %}
+                    <div class="mt-3">
+                        <div class="d-flex align-items-start">
+                            <i class="bi bi-card-text text-muted me-2 mt-1"></i>
+                            <div>
+                                <small class="text-muted">Descripción</small>
+                                <p class="mb-0">{{ object.descripcion }}</p>
+                            </div>
+                        </div>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+
+        <!-- Consequences Warning -->
+        <div class="alert alert-warning border-warning mb-4" role="alert">
+            <h6 class="alert-heading">
+                <i class="bi bi-exclamation-diamond-fill"></i>
+                Posibles Consecuencias:
+            </h6>
+            <ul class="mb-0">
+                <li>No podrás recuperar esta materia una vez eliminada</li>
+                <li>Si tiene inscripciones activas, la eliminación será bloqueada</li>
+                <li>Se perderán las relaciones con alumnos inscriptos</li>
+                <li>Los datos históricos se conservarán por integridad referencial</li>
+                <li>Puede afectar reportes y estadísticas existentes</li>
+            </ul>
+        </div>
+
+        <!-- Current Enrollments Info -->
+        {% if object.inscripciones.exists %}
+            <div class="alert alert-info mb-4" role="alert">
+                <h6 class="alert-heading">
+                    <i class="bi bi-info-circle-fill"></i>
+                    Inscripciones Actuales:
+                </h6>
+                <p class="mb-1">
+                    Esta materia tiene <strong>{{ object.inscripciones.count }}</strong> inscripción(es) activa(s).
+                </p>
+                <p class="mb-0">
+                    <small>
+                        Para poder eliminarla, primero debes gestionar estas inscripciones desde el módulo correspondiente.
+                    </small>
+                </p>
+            </div>
+        {% endif %}
+
+        <!-- Confirmation Form -->
+        <div class="card">
+            <div class="card-body">
+                <form method="post">
+                    {% csrf_token %}
+                    <div class="d-grid gap-2 d-md-flex justify-content-md-center">
+                        <a href="{% url 'materia_list' %}" class="btn btn-success btn-lg me-md-3">
+                            <i class="bi bi-arrow-left"></i>
+                            No, Mantener Materia
+                        </a>
+                        <button type="submit" class="btn btn-danger btn-lg">
+                            <i class="bi bi-trash3-fill"></i>
+                            Sí, Eliminar Definitivamente
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Additional Help -->
+<div class="row mt-5">
+    <div class="col-12">
+        <div class="text-center">
+            <small class="text-muted">
+                <i class="bi bi-question-circle"></i>
+                ¿Necesitas ayuda? Contacta al administrador del sistema.
+            </small>
+        </div>
+    </div>
+</div>
 {% endblock %}

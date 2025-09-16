@@ -13,11 +13,17 @@
 - [x] **carreras/list.html** - Lista CRUD con tabla responsive, stats cards, paginación estilizada
 - [x] **carreras/form.html** - Formulario create/update con cards, validación, panel info lateral
 - [x] **carreras/confirm_delete.html** - Confirmación con warnings, info detallada, consecuencias
+- [x] **materias/list.html** - Lista CRUD con filtros, tabla responsive, stats, cupo disponible
+- [x] **materias/form.html** - Formulario con layout 2 columnas, validaciones, selects estilizados
+- [x] **materias/confirm_delete.html** - Confirmación con info completa, inscripciones, warnings
+- [x] **usuarios/list.html** - Lista CRUD con tabla de usuarios, roles, states, stats cards
+- [x] **usuarios/form.html** - Formulario con layout 2 columnas, info panels, validaciones
+- [x] **usuarios/confirm_delete.html** - Confirmación con warnings específicos por rol, info detallada
 
 ## 📋 Pendientes de Estilizar:
-
-### 👨‍🎓 **Templates de Alumno:**
-- [ ] **alumno/mis_materias.html** - Materias del alumno
+- [ ] **inscripciones/list.html** - Lista CRUD de inscripciones
+- [ ] **inscripciones/form.html** - Formulario de inscripción
+- [ ] **inscripciones/confirm_delete.html** - Confirmación de eliminación de inscripción
 - [ ] **alumno/oferta_academica.html** - Oferta académica disponible
 
 ### 📊 **Templates de Reportes:**
