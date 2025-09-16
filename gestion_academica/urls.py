@@ -9,6 +9,9 @@ urlpatterns = [
     # Página principal
     path('', views.DashboardView.as_view(), name='dashboard'),
     
+    # Autenticación especial
+    path('cambiar-password-primer-login/', views.CambiarPasswordPrimerLoginView.as_view(), name='cambiar_password_primer_login'),
+    
     # Vistas específicas para alumnos
     path('mis-materias/', views.MisMateriaView.as_view(), name='mis_materias'),
     path('oferta-academica/', views.OfertaAcademicaView.as_view(), name='oferta_academica'),

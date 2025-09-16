@@ -1,6 +1,8 @@
 from django.contrib.auth.mixins import LoginRequiredMixin
+from django.contrib.auth.forms import PasswordChangeForm
+from django.contrib.auth import update_session_auth_hash
 from django.contrib import messages
-from django.shortcuts import redirect
+from django.shortcuts import redirect, render
 from django.views import View
 from django.views.generic import TemplateView
 from django.core.exceptions import ValidationError
@@ -17,6 +19,12 @@ from .forms import FiltroMateriaForm
 
 class DashboardView(LoginRequiredMixin, TemplateView):
     template_name = 'gestion_academica/dashboard.html'
+    
+    def dispatch(self, request, *args, **kwargs):
+        # Si el usuario debe cambiar la contraseña, redirigir
+        if request.user.is_authenticated and hasattr(request.user, 'primer_login') and request.user.primer_login:
+            return redirect('cambiar_password_primer_login')
+        return super().dispatch(request, *args, **kwargs)
     
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -35,6 +43,39 @@ class DashboardView(LoginRequiredMixin, TemplateView):
                 messages.error(self.request, 'No se encontró información del alumno.')
         
         return context
+
+
+class CambiarPasswordPrimerLoginView(LoginRequiredMixin, View):
+    """Vista para cambiar contraseña en el primer login"""
+    template_name = 'gestion_academica/auth/cambiar_password_primer_login.html'
+    
+    def get(self, request):
+        # Solo permitir si es primer login
+        if not hasattr(request.user, 'primer_login') or not request.user.primer_login:
+            return redirect('dashboard')
+            
+        form = PasswordChangeForm(request.user)
+        return render(request, self.template_name, {'form': form})
+    
+    def post(self, request):
+        # Solo permitir si es primer login
+        if not hasattr(request.user, 'primer_login') or not request.user.primer_login:
+            return redirect('dashboard')
+            
+        form = PasswordChangeForm(request.user, request.POST)
+        if form.is_valid():
+            user = form.save()
+            # Marcar que ya no es primer login
+            user.primer_login = False
+            user.save()
+            
+            # Actualizar la sesión para que no se cierre
+            update_session_auth_hash(request, user)
+            
+            messages.success(request, 'Contraseña cambiada exitosamente. Ahora puedes acceder al sistema.')
+            return redirect('dashboard')
+        
+        return render(request, self.template_name, {'form': form})
 
 
 class CarrerasPublicasView(TemplateView):
@@ -125,6 +166,12 @@ class MisMateriaView(AlumnoRequiredMixin, TemplateView):
     """Vista para que el alumno vea sus materias"""
     template_name = 'gestion_academica/alumno/mis_materias.html'
     
+    def dispatch(self, request, *args, **kwargs):
+        # Si el usuario debe cambiar la contraseña, redirigir
+        if request.user.is_authenticated and hasattr(request.user, 'primer_login') and request.user.primer_login:
+            return redirect('cambiar_password_primer_login')
+        return super().dispatch(request, *args, **kwargs)
+    
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         try:
@@ -140,6 +187,12 @@ class MisMateriaView(AlumnoRequiredMixin, TemplateView):
 class OfertaAcademicaView(AlumnoRequiredMixin, TemplateView):
     """Vista para que el alumno vea la oferta académica de su carrera"""
     template_name = 'gestion_academica/alumno/oferta_academica.html'
+    
+    def dispatch(self, request, *args, **kwargs):
+        # Si el usuario debe cambiar la contraseña, redirigir
+        if request.user.is_authenticated and hasattr(request.user, 'primer_login') and request.user.primer_login:
+            return redirect('cambiar_password_primer_login')
+        return super().dispatch(request, *args, **kwargs)
     
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
