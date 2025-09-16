@@ -7,15 +7,11 @@
 - [x] **alumnos/form.html** - Formulario de creación/edición con cards, validación y panel lateral
 - [x] **alumnos/detail.html** - Vista detallada con layout 2 columnas, cards organizadas, stats
 - [x] **alumnos/confirm_delete.html** - Confirmación de eliminación con advertencias y diseño centrado
+- [x] **dashboard.html** - Dashboard principal con hero section, cards por rol, estadísticas visuales
+- [x] **publico/carreras.html** - Cards responsive por carrera, badges de estado, enlaces organizados
+- [x] **publico/materias.html** - Tabla responsive con filtros, badges informativos, estados visuales
 
 ## 📋 Pendientes de Estilizar:
-
-### 🏠 **Template Principal:**
-- [ ] **dashboard.html** - Dashboard principal con cards y estadísticas
-
-### 🌐 **Templates Públicos:**
-- [ ] **publico/carreras.html** - Lista pública de carreras
-- [ ] **publico/materias.html** - Lista pública de materias
 
 ### 👨‍🎓 **Templates de Alumno:**
 - [ ] **alumno/mis_materias.html** - Materias del alumno
