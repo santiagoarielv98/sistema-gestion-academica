@@ -10,6 +10,9 @@
 - [x] **dashboard.html** - Dashboard principal con hero section, cards por rol, estadísticas visuales
 - [x] **publico/carreras.html** - Cards responsive por carrera, badges de estado, enlaces organizados
 - [x] **publico/materias.html** - Tabla responsive con filtros, badges informativos, estados visuales
+- [x] **carreras/list.html** - Lista CRUD con tabla responsive, stats cards, paginación estilizada
+- [x] **carreras/form.html** - Formulario create/update con cards, validación, panel info lateral
+- [x] **carreras/confirm_delete.html** - Confirmación con warnings, info detallada, consecuencias
 
 ## 📋 Pendientes de Estilizar:
 
