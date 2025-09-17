@@ -1,114 +1,382 @@
 {% extends 'gestion_academica/base.html' %}
+{% load widget_tweaks %}
 
 {% block title %}
     {% if object %}Editar Usuario{% else %}Nuevo Usuario{% endif %} - Sistema Académico
 {% endblock %}
 
 {% block content %}
-<h1>{% if object %}Editar Usuario{% else %}Nuevo Usuario{% endif %}</h1>
-
-<form method="post">
-    {% csrf_token %}
-    
-    <div>
-        <label for="{{ form.email.id_for_label }}">{{ form.email.label }}</label>
-        {{ form.email }}
-        {% if form.email.errors %}
-            <ul>
-                {% for error in form.email.errors %}
-                    <li>{{ error }}</li>
-                {% endfor %}
-            </ul>
-        {% endif %}
-    </div>
-    
-    <div>
-        <label for="{{ form.dni.id_for_label }}">{{ form.dni.label }}</label>
-        {{ form.dni }}
-        {% if form.dni.errors %}
-            <ul>
-                {% for error in form.dni.errors %}
-                    <li>{{ error }}</li>
-                {% endfor %}
-            </ul>
-        {% endif %}
-    </div>
-    
-    <div>
-        <label for="{{ form.first_name.id_for_label }}">{{ form.first_name.label }}</label>
-        {{ form.first_name }}
-        {% if form.first_name.errors %}
-            <ul>
-                {% for error in form.first_name.errors %}
-                    <li>{{ error }}</li>
-                {% endfor %}
-            </ul>
-        {% endif %}
-    </div>
-    
-    <div>
-        <label for="{{ form.last_name.id_for_label }}">{{ form.last_name.label }}</label>
-        {{ form.last_name }}
-        {% if form.last_name.errors %}
-            <ul>
-                {% for error in form.last_name.errors %}
-                    <li>{{ error }}</li>
-                {% endfor %}
-            </ul>
-        {% endif %}
-    </div>
-    
-    <div>
-        <label for="{{ form.rol.id_for_label }}">{{ form.rol.label }}</label>
-        {{ form.rol }}
-        {% if form.rol.errors %}
-            <ul>
-                {% for error in form.rol.errors %}
-                    <li>{{ error }}</li>
-                {% endfor %}
-            </ul>
-        {% endif %}
-    </div>
-    
-    <div>
-        <label for="{{ form.password.id_for_label }}">{{ form.password.label }}</label>
-        {{ form.password }}
-        {% if form.password.errors %}
-            <ul>
-                {% for error in form.password.errors %}
-                    <li>{{ error }}</li>
-                {% endfor %}
-            </ul>
-        {% endif %}
-        {% if form.password.help_text %}
-            <small>{{ form.password.help_text }}</small>
-        {% endif %}
-    </div>
-    
-    {% if form.non_field_errors %}
-        <div>
-            {% for error in form.non_field_errors %}
-                <p><strong>Error:</strong> {{ error }}</p>
-            {% endfor %}
+<!-- Header Section -->
+<div class="row mb-4">
+    <div class="col-12">
+        <div class="d-flex align-items-center">
+            <div class="me-3">
+                {% if object %}
+                    <i class="bi bi-person-gear text-warning" style="font-size: 2rem;"></i>
+                {% else %}
+                    <i class="bi bi-person-plus text-success" style="font-size: 2rem;"></i>
+                {% endif %}
+            </div>
+            <div>
+                <h1 class="mb-1">{% if object %}Editar Usuario{% else %}Nuevo Usuario{% endif %}</h1>
+                <p class="text-muted mb-0">
+                    {% if object %}
+                        Modifica los datos del usuario "{{ object.get_full_name }}"
+                    {% else %}
+                        Completa el formulario para crear un nuevo usuario del sistema
+                    {% endif %}
+                </p>
+            </div>
         </div>
-    {% endif %}
+    </div>
+</div>
+
+<div class="row">
+    <!-- Form Column -->
+    <div class="col-lg-8">
+        <div class="card">
+            <div class="card-header bg-{% if object %}warning{% else %}success{% endif %} text-white">
+                <h5 class="card-title mb-0">
+                    <i class="bi bi-person-badge"></i>
+                    Datos del Usuario
+                </h5>
+            </div>
+            <div class="card-body">
+                <form method="post">
+                    {% csrf_token %}
+                    
+                    <!-- Email and DNI Row -->
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label for="{{ form.email.id_for_label }}" class="form-label">
+                                    <i class="bi bi-envelope text-primary"></i>
+                                    {{ form.email.label }}
+                                </label>
+                                <div class="input-group">
+                                    <span class="input-group-text">
+                                        <i class="bi bi-at"></i>
+                                    </span>
+                                    {{ form.email|add_class:"form-control" }}
+                                </div>
+                                {% if form.email.errors %}
+                                    <div class="alert alert-danger mt-2 mb-0">
+                                        {% for error in form.email.errors %}
+                                            <small><i class="bi bi-exclamation-triangle"></i> {{ error }}</small>
+                                        {% endfor %}
+                                    </div>
+                                {% endif %}
+                                <div class="form-text">
+                                    <i class="bi bi-info-circle"></i>
+                                    Será usado como nombre de usuario
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label for="{{ form.dni.id_for_label }}" class="form-label">
+                                    <i class="bi bi-card-text text-secondary"></i>
+                                    {{ form.dni.label }}
+                                </label>
+                                <div class="input-group">
+                                    <span class="input-group-text">
+                                        <i class="bi bi-person-vcard"></i>
+                                    </span>
+                                    {{ form.dni|add_class:"form-control" }}
+                                </div>
+                                {% if form.dni.errors %}
+                                    <div class="alert alert-danger mt-2 mb-0">
+                                        {% for error in form.dni.errors %}
+                                            <small><i class="bi bi-exclamation-triangle"></i> {{ error }}</small>
+                                        {% endfor %}
+                                    </div>
+                                {% endif %}
+                                <div class="form-text">
+                                    <i class="bi bi-info-circle"></i>
+                                    Documento Nacional de Identidad
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- First Name and Last Name Row -->
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label for="{{ form.first_name.id_for_label }}" class="form-label">
+                                    <i class="bi bi-person text-info"></i>
+                                    {{ form.first_name.label }}
+                                </label>
+                                <div class="input-group">
+                                    <span class="input-group-text">
+                                        <i class="bi bi-type"></i>
+                                    </span>
+                                    {{ form.first_name|add_class:"form-control" }}
+                                </div>
+                                {% if form.first_name.errors %}
+                                    <div class="alert alert-danger mt-2 mb-0">
+                                        {% for error in form.first_name.errors %}
+                                            <small><i class="bi bi-exclamation-triangle"></i> {{ error }}</small>
+                                        {% endfor %}
+                                    </div>
+                                {% endif %}
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label for="{{ form.last_name.id_for_label }}" class="form-label">
+                                    <i class="bi bi-person text-info"></i>
+                                    {{ form.last_name.label }}
+                                </label>
+                                <div class="input-group">
+                                    <span class="input-group-text">
+                                        <i class="bi bi-type"></i>
+                                    </span>
+                                    {{ form.last_name|add_class:"form-control" }}
+                                </div>
+                                {% if form.last_name.errors %}
+                                    <div class="alert alert-danger mt-2 mb-0">
+                                        {% for error in form.last_name.errors %}
+                                            <small><i class="bi bi-exclamation-triangle"></i> {{ error }}</small>
+                                        {% endfor %}
+                                    </div>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Rol Field -->
+                    <div class="mb-3">
+                        <label for="{{ form.rol.id_for_label }}" class="form-label">
+                            <i class="bi bi-shield-check text-warning"></i>
+                            {{ form.rol.label }}
+                        </label>
+                        <div class="input-group">
+                            <span class="input-group-text">
+                                <i class="bi bi-person-gear"></i>
+                            </span>
+                            {{ form.rol|add_class:"form-select" }}
+                        </div>
+                        {% if form.rol.errors %}
+                            <div class="alert alert-danger mt-2 mb-0">
+                                {% for error in form.rol.errors %}
+                                    <small><i class="bi bi-exclamation-triangle"></i> {{ error }}</small>
+                                {% endfor %}
+                            </div>
+                        {% endif %}
+                        <div class="form-text">
+                            <i class="bi bi-info-circle"></i>
+                            Define los permisos y accesos del usuario
+                        </div>
+                    </div>
+                    
+                    <!-- Password Field -->
+                    <div class="mb-4">
+                        <label for="{{ form.password.id_for_label }}" class="form-label">
+                            <i class="bi bi-key text-success"></i>
+                            {{ form.password.label }}
+                        </label>
+                        <div class="input-group">
+                            <span class="input-group-text">
+                                <i class="bi bi-lock"></i>
+                            </span>
+                            {{ form.password|add_class:"form-control" }}
+                        </div>
+                        {% if form.password.errors %}
+                            <div class="alert alert-danger mt-2 mb-0">
+                                {% for error in form.password.errors %}
+                                    <small><i class="bi bi-exclamation-triangle"></i> {{ error }}</small>
+                                {% endfor %}
+                            </div>
+                        {% endif %}
+                        {% if form.password.help_text %}
+                            <div class="form-text">
+                                <i class="bi bi-info-circle"></i>
+                                {{ form.password.help_text }}
+                            </div>
+                        {% endif %}
+                    </div>
+                    
+                    <!-- General Errors -->
+                    {% if form.non_field_errors %}
+                        <div class="alert alert-danger">
+                            <h6><i class="bi bi-exclamation-triangle"></i> Errores del formulario:</h6>
+                            {% for error in form.non_field_errors %}
+                                <p class="mb-1"><strong>Error:</strong> {{ error }}</p>
+                            {% endfor %}
+                        </div>
+                    {% endif %}
+                    
+                    <!-- Action Buttons -->
+                    <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+                        <a href="{% url 'usuario_list' %}" class="btn btn-secondary me-md-2">
+                            <i class="bi bi-arrow-left"></i>
+                            Cancelar
+                        </a>
+                        <button type="submit" class="btn btn-{% if object %}warning{% else %}success{% endif %} btn-lg">
+                            <i class="bi bi-{% if object %}arrow-repeat{% else %}person-plus{% endif %}"></i>
+                            {% if object %}Actualizar{% else %}Crear{% endif %} Usuario
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
     
-    <button type="submit">{% if object %}Actualizar{% else %}Crear{% endif %} Usuario</button>
-    <a href="{% url 'gestion_academica:usuario_list' %}">Cancelar</a>
-</form>
-
-<hr>
-<h3>Información sobre Roles</h3>
-<ul>
-    <li><strong>Administrador:</strong> Acceso completo al sistema</li>
-    <li><strong>Alumno:</strong> Puede ver sus materias e inscribirse</li>
-    <li><strong>Invitado:</strong> Solo puede consultar la oferta académica</li>
-    <li><strong>Docente:</strong> Funcionalidad futura</li>
-    <li><strong>Preceptor:</strong> Funcionalidad futura</li>
-</ul>
-
-{% if not object %}
-<h3>Contraseña Inicial</h3>
-<p>Si no se especifica una contraseña, se usará el DNI como contraseña inicial. El usuario deberá cambiarla en su primer acceso.</p>
-{% endif %}
+    <!-- Info Panel -->
+    <div class="col-lg-4">
+        <!-- Roles Information Card -->
+        <div class="card mb-4">
+            <div class="card-header bg-info text-white">
+                <h5 class="card-title mb-0">
+                    <i class="bi bi-shield-check"></i>
+                    Información sobre Roles
+                </h5>
+            </div>
+            <div class="card-body">
+                <div class="list-group list-group-flush">
+                    <div class="list-group-item">
+                        <div class="d-flex align-items-center">
+                            <span class="badge bg-warning text-dark me-2">Admin</span>
+                            <div>
+                                <small><strong>Administrador:</strong></small>
+                                <div class="text-muted" style="font-size: 0.8rem;">
+                                    Acceso completo al sistema
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="list-group-item">
+                        <div class="d-flex align-items-center">
+                            <span class="badge bg-info text-white me-2">Alumno</span>
+                            <div>
+                                <small><strong>Alumno:</strong></small>
+                                <div class="text-muted" style="font-size: 0.8rem;">
+                                    Puede ver sus materias e inscribirse
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="list-group-item">
+                        <div class="d-flex align-items-center">
+                            <span class="badge bg-secondary me-2">Invitado</span>
+                            <div>
+                                <small><strong>Invitado:</strong></small>
+                                <div class="text-muted" style="font-size: 0.8rem;">
+                                    Solo puede consultar la oferta académica
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="list-group-item">
+                        <div class="d-flex align-items-center">
+                            <span class="badge bg-light text-dark me-2">Docente</span>
+                            <div>
+                                <small><strong>Docente:</strong></small>
+                                <div class="text-muted" style="font-size: 0.8rem;">
+                                    Funcionalidad futura
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="list-group-item">
+                        <div class="d-flex align-items-center">
+                            <span class="badge bg-light text-dark me-2">Preceptor</span>
+                            <div>
+                                <small><strong>Preceptor:</strong></small>
+                                <div class="text-muted" style="font-size: 0.8rem;">
+                                    Funcionalidad futura
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        {% if not object %}
+            <!-- Password Information Card -->
+            <div class="card mb-4">
+                <div class="card-header bg-success text-white">
+                    <h5 class="card-title mb-0">
+                        <i class="bi bi-key"></i>
+                        Contraseña Inicial
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <div class="alert alert-info">
+                        <i class="bi bi-info-circle"></i>
+                        <small>
+                            <strong>Si no se especifica una contraseña:</strong>
+                            <br>Se usará el DNI como contraseña inicial. 
+                            <br>El usuario deberá cambiarla en su primer acceso.
+                        </small>
+                    </div>
+                </div>
+            </div>
+        {% endif %}
+        
+        {% if object %}
+            <!-- User Status Card -->
+            <div class="card mb-4">
+                <div class="card-header bg-light">
+                    <h5 class="card-title mb-0">
+                        <i class="bi bi-person-circle"></i>
+                        Estado Actual
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <p class="mb-2">
+                        <strong>Estado:</strong> 
+                        <span class="badge bg-{% if object.is_active %}success{% else %}danger{% endif %}">
+                            {% if object.is_active %}Activo{% else %}Inactivo{% endif %}
+                        </span>
+                    </p>
+                    <p class="mb-2">
+                        <strong>Primer Login:</strong> 
+                        <span class="badge bg-{% if object.primer_login %}warning text-dark{% else %}success{% endif %}">
+                            {% if object.primer_login %}Pendiente{% else %}Completado{% endif %}
+                        </span>
+                    </p>
+                    <p class="mb-1">
+                        <small class="text-muted">
+                            <i class="bi bi-calendar"></i>
+                            Última conexión: {{ object.last_login|default:"Nunca" }}
+                        </small>
+                    </p>
+                </div>
+            </div>
+        {% endif %}
+        
+        <!-- Security Tips -->
+        <div class="card">
+            <div class="card-header bg-secondary text-white">
+                <h5 class="card-title mb-0">
+                    <i class="bi bi-shield-exclamation"></i>
+                    Consejos de Seguridad
+                </h5>
+            </div>
+            <div class="card-body">
+                <ul class="list-unstyled mb-0">
+                    <li class="mb-2">
+                        <i class="bi bi-check2 text-success"></i>
+                        <small>Use emails válidos y únicos</small>
+                    </li>
+                    <li class="mb-2">
+                        <i class="bi bi-check2 text-success"></i>
+                        <small>Los DNI deben ser únicos</small>
+                    </li>
+                    <li class="mb-2">
+                        <i class="bi bi-check2 text-success"></i>
+                        <small>Asigne el rol apropiado</small>
+                    </li>
+                    <li class="mb-0">
+                        <i class="bi bi-check2 text-success"></i>
+                        <small>Use contraseñas seguras</small>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>
 {% endblock %}

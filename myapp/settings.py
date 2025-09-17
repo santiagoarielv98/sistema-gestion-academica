@@ -37,7 +37,13 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'usuario',
+    'carrera',
+    'materia',
+    'alumno',
+    'inscripcion',
     'gestion_academica',
+    'widget_tweaks',
 ]
 
 MIDDLEWARE = [
@@ -50,7 +56,7 @@ MIDDLEWARE = [
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
 
-ROOT_URLCONF = 'demo.urls'
+ROOT_URLCONF = 'myapp.urls'
 
 TEMPLATES = [
     {
@@ -67,7 +73,7 @@ TEMPLATES = [
     },
 ]
 
-WSGI_APPLICATION = 'demo.wsgi.application'
+WSGI_APPLICATION = 'myapp.wsgi.application'
 
 
 # Database
@@ -123,7 +129,7 @@ STATIC_URL = 'static/'
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 # Modelo de usuario personalizado
-AUTH_USER_MODEL = 'gestion_academica.Usuario'
+AUTH_USER_MODEL = 'usuario.Usuario'
 
 # URLs de autenticación
 LOGIN_URL = '/login/'

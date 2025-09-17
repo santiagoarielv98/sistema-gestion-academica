@@ -1,63 +1,289 @@
 {% extends 'gestion_academica/base.html' %}
+{% load widget_tweaks %}
 
 {% block title %}Usuarios - Sistema Académico{% endblock %}
 
 {% block content %}
-<h1>Gestión de Usuarios</h1>
-
-<p><a href="{% url 'gestion_academica:usuario_create' %}">Crear Nuevo Usuario</a></p>
+<!-- Header Section -->
+<div class="row mb-4">
+    <div class="col-12">
+        <div class="d-flex justify-content-between align-items-center">
+            <div>
+                <h1 class="mb-1">
+                    <i class="bi bi-people-fill text-primary"></i>
+                    Gestión de Usuarios
+                </h1>
+                <p class="text-muted mb-0">Administra todos los usuarios del sistema académico</p>
+            </div>
+            <div>
+                <a href="{% url 'usuario_create' %}" class="btn btn-success btn-lg">
+                    <i class="bi bi-person-plus"></i>
+                    Crear Nuevo Usuario
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
 
 {% if usuarios %}
-    <table border="1">
-        <thead>
-            <tr>
-                <th>Nombre Completo</th>
-                <th>DNI</th>
-                <th>Email</th>
-                <th>Rol</th>
-                <th>Primer Login</th>
-                <th>Estado</th>
-                <th>Acciones</th>
-            </tr>
-        </thead>
-        <tbody>
-            {% for usuario in usuarios %}
-            <tr>
-                <td>{{ usuario.get_full_name }}</td>
-                <td>{{ usuario.dni }}</td>
-                <td>{{ usuario.email }}</td>
-                <td>{{ usuario.get_rol_display }}</td>
-                <td>{% if usuario.primer_login %}Pendiente{% else %}Completado{% endif %}</td>
-                <td>{% if usuario.is_active %}Activo{% else %}Inactivo{% endif %}</td>
-                <td>
-                    <a href="{% url 'gestion_academica:usuario_update' usuario.pk %}">Editar</a> |
-                    <a href="{% url 'gestion_academica:usuario_delete' usuario.pk %}">Eliminar</a>
-                </td>
-            </tr>
-            {% endfor %}
-        </tbody>
-    </table>
+    <!-- Stats Section -->
+    <div class="row mb-4">
+        <div class="col-md-3">
+            <div class="card bg-primary text-white">
+                <div class="card-body text-center">
+                    <i class="bi bi-people-fill fs-1"></i>
+                    <h3 class="mt-2">{{ usuarios|length }}</h3>
+                    <p class="mb-0">Total Usuarios</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card bg-success text-white">
+                <div class="card-body text-center">
+                    <i class="bi bi-person-check-fill fs-1"></i>
+                    <h3 class="mt-2">{{ usuarios_activos|default:"-" }}</h3>
+                    <p class="mb-0">Usuarios Activos</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card bg-warning text-dark">
+                <div class="card-body text-center">
+                    <i class="bi bi-person-gear fs-1"></i>
+                    <h3 class="mt-2">{{ administradores|default:"-" }}</h3>
+                    <p class="mb-0">Administradores</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card bg-info text-white">
+                <div class="card-body text-center">
+                    <i class="bi bi-mortarboard-fill fs-1"></i>
+                    <h3 class="mt-2">{{ alumnos|default:"-" }}</h3>
+                    <p class="mb-0">Alumnos</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Users Table -->
+    <div class="row">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header bg-dark text-white">
+                    <h5 class="card-title mb-0">
+                        <i class="bi bi-table"></i>
+                        Listado de Usuarios
+                    </h5>
+                </div>
+                <div class="card-body p-0">
+                    <div class="table-responsive">
+                        <table class="table table-striped table-hover mb-0">
+                            <thead class="table-dark">
+                                <tr>
+                                    <th scope="col">
+                                        <i class="bi bi-person"></i>
+                                        Nombre Completo
+                                    </th>
+                                    <th scope="col" class="text-center">
+                                        <i class="bi bi-card-text"></i>
+                                        DNI
+                                    </th>
+                                    <th scope="col">
+                                        <i class="bi bi-envelope"></i>
+                                        Email
+                                    </th>
+                                    <th scope="col" class="text-center">
+                                        <i class="bi bi-shield-check"></i>
+                                        Rol
+                                    </th>
+                                    <th scope="col" class="text-center">
+                                        <i class="bi bi-key"></i>
+                                        Primer Login
+                                    </th>
+                                    <th scope="col" class="text-center">
+                                        <i class="bi bi-toggle-on"></i>
+                                        Estado
+                                    </th>
+                                    <th scope="col" class="text-center">
+                                        <i class="bi bi-gear"></i>
+                                        Acciones
+                                    </th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for usuario in usuarios %}
+                                <tr>
+                                    <td class="fw-bold text-primary">
+                                        <i class="bi bi-person-circle me-2"></i>
+                                        {{ usuario.get_full_name }}
+                                    </td>
+                                    <td class="text-center">
+                                        <span class="badge bg-secondary fs-6">{{ usuario.dni }}</span>
+                                    </td>
+                                    <td>
+                                        <a href="mailto:{{ usuario.email }}" class="text-decoration-none">
+                                            <i class="bi bi-envelope me-1"></i>
+                                            {{ usuario.email }}
+                                        </a>
+                                    </td>
+                                    <td class="text-center">
+                                        {% if usuario.rol == 'administrador' %}
+                                            <span class="badge bg-warning text-dark fs-6">
+                                                <i class="bi bi-person-gear"></i>
+                                                {{ usuario.get_rol_display }}
+                                            </span>
+                                        {% elif usuario.rol == 'alumno' %}
+                                            <span class="badge bg-info fs-6">
+                                                <i class="bi bi-mortarboard"></i>
+                                                {{ usuario.get_rol_display }}
+                                            </span>
+                                        {% else %}
+                                            <span class="badge bg-secondary fs-6">
+                                                {{ usuario.get_rol_display }}
+                                            </span>
+                                        {% endif %}
+                                    </td>
+                                    <td class="text-center">
+                                        {% if usuario.primer_login %}
+                                            <span class="badge bg-warning text-dark fs-6">
+                                                <i class="bi bi-exclamation-triangle"></i>
+                                                Pendiente
+                                            </span>
+                                        {% else %}
+                                            <span class="badge bg-success fs-6">
+                                                <i class="bi bi-check-circle"></i>
+                                                Completado
+                                            </span>
+                                        {% endif %}
+                                    </td>
+                                    <td class="text-center">
+                                        {% if usuario.is_active %}
+                                            <span class="badge bg-success fs-6">
+                                                <i class="bi bi-person-check"></i>
+                                                Activo
+                                            </span>
+                                        {% else %}
+                                            <span class="badge bg-danger fs-6">
+                                                <i class="bi bi-person-x"></i>
+                                                Inactivo
+                                            </span>
+                                        {% endif %}
+                                    </td>
+                                    <td class="text-center">
+                                        <div class="btn-group" role="group">
+                                            <a href="{% url 'usuario_update' usuario.pk %}" 
+                                               class="btn btn-sm btn-outline-warning" 
+                                               title="Editar usuario">
+                                                <i class="bi bi-pencil-square"></i>
+                                                Editar
+                                            </a>
+                                            <a href="{% url 'usuario_delete' usuario.pk %}" 
+                                               class="btn btn-sm btn-outline-danger" 
+                                               title="Eliminar usuario">
+                                                <i class="bi bi-trash3"></i>
+                                                Eliminar
+                                            </a>
+                                        </div>
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
     
+    <!-- Pagination -->
     {% if is_paginated %}
-        <div>
-            <span>
-                {% if page_obj.has_previous %}
-                    <a href="?page=1">« primera</a>
-                    <a href="?page={{ page_obj.previous_page_number }}">anterior</a>
-                {% endif %}
-                
-                <span>
-                    Página {{ page_obj.number }} de {{ page_obj.paginator.num_pages }}
-                </span>
-                
-                {% if page_obj.has_next %}
-                    <a href="?page={{ page_obj.next_page_number }}">siguiente</a>
-                    <a href="?page={{ page_obj.paginator.num_pages }}">última »</a>
-                {% endif %}
-            </span>
+        <div class="row mt-4">
+            <div class="col-12">
+                <nav aria-label="Paginación de usuarios">
+                    <ul class="pagination justify-content-center">
+                        {% if page_obj.has_previous %}
+                            <li class="page-item">
+                                <a class="page-link" href="?page=1" title="Primera página">
+                                    <i class="bi bi-chevron-double-left"></i>
+                                    Primera
+                                </a>
+                            </li>
+                            <li class="page-item">
+                                <a class="page-link" href="?page={{ page_obj.previous_page_number }}" title="Página anterior">
+                                    <i class="bi bi-chevron-left"></i>
+                                    Anterior
+                                </a>
+                            </li>
+                        {% else %}
+                            <li class="page-item disabled">
+                                <span class="page-link">
+                                    <i class="bi bi-chevron-double-left"></i>
+                                    Primera
+                                </span>
+                            </li>
+                            <li class="page-item disabled">
+                                <span class="page-link">
+                                    <i class="bi bi-chevron-left"></i>
+                                    Anterior
+                                </span>
+                            </li>
+                        {% endif %}
+                        
+                        <li class="page-item active">
+                            <span class="page-link">
+                                Página {{ page_obj.number }} de {{ page_obj.paginator.num_pages }}
+                            </span>
+                        </li>
+                        
+                        {% if page_obj.has_next %}
+                            <li class="page-item">
+                                <a class="page-link" href="?page={{ page_obj.next_page_number }}" title="Página siguiente">
+                                    Siguiente
+                                    <i class="bi bi-chevron-right"></i>
+                                </a>
+                            </li>
+                            <li class="page-item">
+                                <a class="page-link" href="?page={{ page_obj.paginator.num_pages }}" title="Última página">
+                                    Última
+                                    <i class="bi bi-chevron-double-right"></i>
+                                </a>
+                            </li>
+                        {% else %}
+                            <li class="page-item disabled">
+                                <span class="page-link">
+                                    Siguiente
+                                    <i class="bi bi-chevron-right"></i>
+                                </span>
+                            </li>
+                            <li class="page-item disabled">
+                                <span class="page-link">
+                                    Última
+                                    <i class="bi bi-chevron-double-right"></i>
+                                </span>
+                            </li>
+                        {% endif %}
+                    </ul>
+                </nav>
+            </div>
         </div>
     {% endif %}
 {% else %}
-    <p>No hay usuarios registrados en el sistema.</p>
+    <!-- Empty State -->
+    <div class="row">
+        <div class="col-12">
+            <div class="text-center py-5">
+                <div class="mb-4">
+                    <i class="bi bi-people text-muted" style="font-size: 4rem;"></i>
+                </div>
+                <h3 class="text-muted mb-3">No hay usuarios registrados</h3>
+                <p class="text-muted mb-4">Comienza creando el primer usuario del sistema académico.</p>
+                <a href="{% url 'usuario_create' %}" class="btn btn-primary btn-lg">
+                    <i class="bi bi-person-plus"></i>
+                    Crear Primer Usuario
+                </a>
+            </div>
+        </div>
+    </div>
 {% endif %}
 {% endblock %}

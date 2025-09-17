@@ -5,157 +5,385 @@
 {% endblock %}
 
 {% block content %}
-<h1>{% if object %}Editar Alumno{% else %}Nuevo Alumno{% endif %}</h1>
-
-<form method="post">
-    {% csrf_token %}
-    
-    <!-- Datos del Usuario -->
-    <fieldset>
-        <legend>Datos Personales</legend>
-        
-        <div>
-            <label for="{{ form.dni.id_for_label }}">{{ form.dni.label }}</label>
-            {{ form.dni }}
-            {% if form.dni.errors %}
-                <ul>
-                    {% for error in form.dni.errors %}
-                        <li>{{ error }}</li>
-                    {% endfor %}
-                </ul>
-            {% endif %}
-            <small>8 dígitos, será usado como contraseña inicial</small>
-        </div>
-        
-        <div>
-            <label for="{{ form.nombre.id_for_label }}">{{ form.nombre.label }}</label>
-            {{ form.nombre }}
-            {% if form.nombre.errors %}
-                <ul>
-                    {% for error in form.nombre.errors %}
-                        <li>{{ error }}</li>
-                    {% endfor %}
-                </ul>
-            {% endif %}
-        </div>
-        
-        <div>
-            <label for="{{ form.apellido.id_for_label }}">{{ form.apellido.label }}</label>
-            {{ form.apellido }}
-            {% if form.apellido.errors %}
-                <ul>
-                    {% for error in form.apellido.errors %}
-                        <li>{{ error }}</li>
-                    {% endfor %}
-                </ul>
-            {% endif %}
-        </div>
-        
-        <div>
-            <label for="{{ form.email.id_for_label }}">{{ form.email.label }}</label>
-            {{ form.email }}
-            {% if form.email.errors %}
-                <ul>
-                    {% for error in form.email.errors %}
-                        <li>{{ error }}</li>
-                    {% endfor %}
-                </ul>
-            {% endif %}
-            <small>Se usará para acceso al sistema</small>
-        </div>
-    </fieldset>
-    
-    <!-- Datos del Alumno -->
-    <fieldset>
-        <legend>Datos Académicos</legend>
-        
-        <div>
-            <label for="{{ form.legajo.id_for_label }}">{{ form.legajo.label }}</label>
-            {{ form.legajo }}
-            {% if form.legajo.errors %}
-                <ul>
-                    {% for error in form.legajo.errors %}
-                        <li>{{ error }}</li>
-                    {% endfor %}
-                </ul>
-            {% endif %}
-            <small>Número único de identificación del alumno</small>
-        </div>
-        
-        <div>
-            <label for="{{ form.carrera.id_for_label }}">{{ form.carrera.label }}</label>
-            {{ form.carrera }}
-            {% if form.carrera.errors %}
-                <ul>
-                    {% for error in form.carrera.errors %}
-                        <li>{{ error }}</li>
-                    {% endfor %}
-                </ul>
-            {% endif %}
-        </div>
-        
-        <div>
-            <label for="{{ form.año_ingreso.id_for_label }}">{{ form.año_ingreso.label }}</label>
-            {{ form.año_ingreso }}
-            {% if form.año_ingreso.errors %}
-                <ul>
-                    {% for error in form.año_ingreso.errors %}
-                        <li>{{ error }}</li>
-                    {% endfor %}
-                </ul>
-            {% endif %}
-            <small>Año en que ingresó a la institución</small>
-        </div>
-    </fieldset>
-    
-    {% if form.non_field_errors %}
-        <div>
-            <strong>Errores del formulario:</strong>
-            {% for error in form.non_field_errors %}
-                <p><strong>Error:</strong> {{ error }}</p>
-            {% endfor %}
-        </div>
-    {% endif %}
-    
-    <div>
-        <button type="submit">{% if object %}Actualizar{% else %}Crear{% endif %} Alumno</button>
-        <a href="{% url 'gestion_academica:alumno_list' %}">Cancelar</a>
+<!-- Page Header -->
+<div class="row mb-4">
+    <div class="col">
+        <nav aria-label="breadcrumb">
+            <ol class="breadcrumb">
+                <li class="breadcrumb-item"><a href="{% url 'dashboard' %}">Inicio</a></li>
+                <li class="breadcrumb-item"><a href="{% url 'alumno_list' %}">Alumnos</a></li>
+                <li class="breadcrumb-item active">{% if object %}Editar{% else %}Nuevo{% endif %}</li>
+            </ol>
+        </nav>
+        <h1 class="h2 mb-0">
+            <i class="bi bi-{% if object %}pencil{% else %}person-plus{% endif %}-fill text-primary me-2"></i>
+            {% if object %}Editar Alumno{% else %}Nuevo Alumno{% endif %}
+        </h1>
+        <p class="text-muted">{% if object %}Modifica{% else %}Completa{% endif %} la información del alumno y su usuario asociado</p>
     </div>
-</form>
-
-{% if not object %}
-<hr>
-<div>
-    <h3>Información sobre la creación de usuario</h3>
-    <p><strong>Al crear un alumno, se generará automáticamente un usuario con:</strong></p>
-    <ul>
-        <li><strong>Usuario:</strong> Email del alumno</li>
-        <li><strong>Contraseña inicial:</strong> DNI del alumno</li>
-        <li><strong>Rol:</strong> Alumno (grupo "Alumnos")</li>
-        <li><strong>Estado:</strong> Activo, deberá cambiar contraseña en primer acceso</li>
-    </ul>
-    <p><em>El alumno podrá acceder al sistema usando su email y DNI como contraseña inicial.</em></p>
 </div>
-{% endif %}
 
-{% if object %}
-<hr>
-<div>
-    <h3>Datos del Usuario Asociado</h3>
-    {% if object.usuario %}
-        <p><strong>Email de acceso:</strong> {{ object.usuario.email }}</p>
-        <p><strong>DNI:</strong> {{ object.usuario.username }}</p>
-        <p><strong>Grupos:</strong> 
-            {% for grupo in object.usuario.groups.all %}
-                {{ grupo.name }}{% if not forloop.last %}, {% endif %}
-            {% empty %}
-                Sin grupos asignados
-            {% endfor %}
-        </p>
-        <p><strong>Estado:</strong> {% if object.usuario.is_active %}Activo{% else %}Inactivo{% endif %}</p>
-    {% else %}
-        <p><em>Este alumno no tiene usuario asociado.</em></p>
-    {% endif %}
+<div class="row">
+    <div class="col-lg-8">
+        <form method="post">
+            {% csrf_token %}
+            
+            <!-- Errores generales del formulario -->
+            {% if form.non_field_errors %}
+                <div class="alert alert-danger" role="alert">
+                    <h6 class="alert-heading">
+                        <i class="bi bi-exclamation-triangle-fill me-2"></i>
+                        Errores del formulario:
+                    </h6>
+                    {% for error in form.non_field_errors %}
+                        <p class="mb-1">{{ error }}</p>
+                    {% endfor %}
+                </div>
+            {% endif %}
+            
+            <!-- Datos Personales -->
+            <div class="card shadow mb-4">
+                <div class="card-header bg-primary text-white">
+                    <h5 class="card-title mb-0">
+                        <i class="bi bi-person-vcard me-2"></i>
+                        Datos Personales
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <!-- DNI -->
+                        <div class="col-md-6 mb-3">
+                            <label for="{{ form.dni.id_for_label }}" class="form-label">
+                                <i class="bi bi-card-text me-1"></i>{{ form.dni.label }}
+                            </label>
+                            <div class="input-group">
+                                <span class="input-group-text">
+                                    <i class="bi bi-123"></i>
+                                </span>
+                                <input type="text" name="{{ form.dni.name }}" class="form-control{% if form.dni.errors %} is-invalid{% endif %}" 
+                                       id="{{ form.dni.id_for_label }}" value="{{ form.dni.value|default:'' }}" 
+                                       placeholder="12345678" maxlength="8" pattern="[0-9]{8}" required>
+                            </div>
+                            {% if form.dni.errors %}
+                                <div class="invalid-feedback">
+                                    {% for error in form.dni.errors %}{{ error }}{% endfor %}
+                                </div>
+                            {% else %}
+                                <div class="form-text">8 dígitos, será usado como contraseña inicial</div>
+                            {% endif %}
+                        </div>
+                        
+                        <!-- Email -->
+                        <div class="col-md-6 mb-3">
+                            <label for="{{ form.email.id_for_label }}" class="form-label">
+                                <i class="bi bi-envelope me-1"></i>{{ form.email.label }}
+                            </label>
+                            <div class="input-group">
+                                <span class="input-group-text">
+                                    <i class="bi bi-at"></i>
+                                </span>
+                                <input type="email" name="{{ form.email.name }}" class="form-control{% if form.email.errors %} is-invalid{% endif %}" 
+                                       id="{{ form.email.id_for_label }}" value="{{ form.email.value|default:'' }}" 
+                                       placeholder="alumno@ejemplo.com" required>
+                            </div>
+                            {% if form.email.errors %}
+                                <div class="invalid-feedback">
+                                    {% for error in form.email.errors %}{{ error }}{% endfor %}
+                                </div>
+                            {% else %}
+                                <div class="form-text">Se usará para acceso al sistema</div>
+                            {% endif %}
+                        </div>
+                    </div>
+                    
+                    <div class="row">
+                        <!-- Nombre -->
+                        <div class="col-md-6 mb-3">
+                            <label for="{{ form.nombre.id_for_label }}" class="form-label">
+                                <i class="bi bi-person me-1"></i>{{ form.nombre.label }}
+                            </label>
+                            <div class="input-group">
+                                <span class="input-group-text">
+                                    <i class="bi bi-person-fill"></i>
+                                </span>
+                                <input type="text" name="{{ form.nombre.name }}" class="form-control{% if form.nombre.errors %} is-invalid{% endif %}" 
+                                       id="{{ form.nombre.id_for_label }}" value="{{ form.nombre.value|default:'' }}" 
+                                       placeholder="Juan" required>
+                            </div>
+                            {% if form.nombre.errors %}
+                                <div class="invalid-feedback">
+                                    {% for error in form.nombre.errors %}{{ error }}{% endfor %}
+                                </div>
+                            {% endif %}
+                        </div>
+                        
+                        <!-- Apellido -->
+                        <div class="col-md-6 mb-3">
+                            <label for="{{ form.apellido.id_for_label }}" class="form-label">
+                                <i class="bi bi-person me-1"></i>{{ form.apellido.label }}
+                            </label>
+                            <div class="input-group">
+                                <span class="input-group-text">
+                                    <i class="bi bi-person-fill"></i>
+                                </span>
+                                <input type="text" name="{{ form.apellido.name }}" class="form-control{% if form.apellido.errors %} is-invalid{% endif %}" 
+                                       id="{{ form.apellido.id_for_label }}" value="{{ form.apellido.value|default:'' }}" 
+                                       placeholder="Pérez" required>
+                            </div>
+                            {% if form.apellido.errors %}
+                                <div class="invalid-feedback">
+                                    {% for error in form.apellido.errors %}{{ error }}{% endfor %}
+                                </div>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Datos Académicos -->
+            <div class="card shadow mb-4">
+                <div class="card-header bg-success text-white">
+                    <h5 class="card-title mb-0">
+                        <i class="bi bi-mortarboard me-2"></i>
+                        Datos Académicos
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <!-- Legajo -->
+                        <div class="col-md-4 mb-3">
+                            <label for="{{ form.legajo.id_for_label }}" class="form-label">
+                                <i class="bi bi-hash me-1"></i>{{ form.legajo.label }}
+                            </label>
+                            <div class="input-group">
+                                <span class="input-group-text">
+                                    <i class="bi bi-123"></i>
+                                </span>
+                                <input type="text" name="{{ form.legajo.name }}" class="form-control{% if form.legajo.errors %} is-invalid{% endif %}" 
+                                       id="{{ form.legajo.id_for_label }}" value="{{ form.legajo.value|default:'' }}" 
+                                       placeholder="A001" required>
+                            </div>
+                            {% if form.legajo.errors %}
+                                <div class="invalid-feedback">
+                                    {% for error in form.legajo.errors %}{{ error }}{% endfor %}
+                                </div>
+                            {% else %}
+                                <div class="form-text">Número único de identificación</div>
+                            {% endif %}
+                        </div>
+                        
+                        <!-- Carrera -->
+                        <div class="col-md-4 mb-3">
+                            <label for="{{ form.carrera.id_for_label }}" class="form-label">
+                                <i class="bi bi-building me-1"></i>{{ form.carrera.label }}
+                            </label>
+                            <div class="input-group">
+                                <span class="input-group-text">
+                                    <i class="bi bi-mortarboard"></i>
+                                </span>
+                                <select name="{{ form.carrera.name }}" class="form-select{% if form.carrera.errors %} is-invalid{% endif %}" 
+                                        id="{{ form.carrera.id_for_label }}" required>
+                                    <option value="">Seleccionar carrera...</option>
+                                    {% for choice in form.carrera.field.choices %}
+                                        {% if choice.0 %}
+                                            <option value="{{ choice.0 }}" {% if choice.0 == form.carrera.value %}selected{% endif %}>{{ choice.1 }}</option>
+                                        {% endif %}
+                                    {% endfor %}
+                                </select>
+                            </div>
+                            {% if form.carrera.errors %}
+                                <div class="invalid-feedback">
+                                    {% for error in form.carrera.errors %}{{ error }}{% endfor %}
+                                </div>
+                            {% endif %}
+                        </div>
+                        
+                        <!-- Año de Ingreso -->
+                        <div class="col-md-4 mb-3">
+                            <label for="{{ form.año_ingreso.id_for_label }}" class="form-label">
+                                <i class="bi bi-calendar me-1"></i>{{ form.año_ingreso.label }}
+                            </label>
+                            <div class="input-group">
+                                <span class="input-group-text">
+                                    <i class="bi bi-calendar-event"></i>
+                                </span>
+                                <input type="number" name="{{ form.año_ingreso.name }}" class="form-control{% if form.año_ingreso.errors %} is-invalid{% endif %}" 
+                                       id="{{ form.año_ingreso.id_for_label }}" value="{{ form.año_ingreso.value|default:'' }}" 
+                                       placeholder="2024" min="2000" max="2030" required>
+                            </div>
+                            {% if form.año_ingreso.errors %}
+                                <div class="invalid-feedback">
+                                    {% for error in form.año_ingreso.errors %}{{ error }}{% endfor %}
+                                </div>
+                            {% else %}
+                                <div class="form-text">Año de ingreso a la institución</div>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Botones de acción -->
+            <div class="card shadow">
+                <div class="card-body">
+                    <div class="d-flex justify-content-end gap-2">
+                        <a href="{% url 'alumno_list' %}" class="btn btn-secondary">
+                            <i class="bi bi-arrow-left me-2"></i>Cancelar
+                        </a>
+                        <button type="submit" class="btn btn-primary">
+                            <i class="bi bi-{% if object %}check{% else %}plus{% endif %}-circle-fill me-2"></i>
+                            {% if object %}Actualizar{% else %}Crear{% endif %} Alumno
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </form>
+    </div>
+    
+    <!-- Panel lateral de información -->
+    <div class="col-lg-4">
+        {% if not object %}
+            <!-- Información para nuevo alumno -->
+            <div class="card shadow mb-4">
+                <div class="card-header bg-info text-white">
+                    <h6 class="card-title mb-0">
+                        <i class="bi bi-info-circle-fill me-2"></i>
+                        Creación Automática de Usuario
+                    </h6>
+                </div>
+                <div class="card-body">
+                    <p class="mb-2"><strong>Al crear un alumno se generará automáticamente:</strong></p>
+                    <ul class="list-unstyled mb-0">
+                        <li class="mb-2">
+                            <i class="bi bi-check-circle text-success me-2"></i>
+                            <strong>Usuario:</strong> Email del alumno
+                        </li>
+                        <li class="mb-2">
+                            <i class="bi bi-check-circle text-success me-2"></i>
+                            <strong>Contraseña:</strong> DNI del alumno
+                        </li>
+                        <li class="mb-2">
+                            <i class="bi bi-check-circle text-success me-2"></i>
+                            <strong>Grupo:</strong> "Alumnos"
+                        </li>
+                        <li class="mb-0">
+                            <i class="bi bi-check-circle text-success me-2"></i>
+                            <strong>Estado:</strong> Activo, deberá cambiar contraseña
+                        </li>
+                    </ul>
+                </div>
+                <div class="card-footer bg-light">
+                    <small class="text-muted">
+                        <i class="bi bi-lightbulb me-1"></i>
+                        El alumno podrá acceder usando su email y DNI como contraseña inicial.
+                    </small>
+                </div>
+            </div>
+        {% endif %}
+        
+        {% if object %}
+            <!-- Información del usuario asociado -->
+            <div class="card shadow">
+                <div class="card-header bg-warning text-dark">
+                    <h6 class="card-title mb-0">
+                        <i class="bi bi-person-badge me-2"></i>
+                        Usuario Asociado
+                    </h6>
+                </div>
+                <div class="card-body">
+                    {% if object.usuario %}
+                        <div class="mb-3">
+                            <label class="form-label small text-muted">Email de acceso:</label>
+                            <div class="fw-bold">{{ object.usuario.email }}</div>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label small text-muted">Usuario:</label>
+                            <div class="fw-bold font-monospace">{{ object.usuario.username }}</div>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label small text-muted">Grupos:</label>
+                            <div>
+                                {% for grupo in object.usuario.groups.all %}
+                                    <span class="badge bg-primary me-1">{{ grupo.name }}</span>
+                                {% empty %}
+                                    <span class="text-muted">Sin grupos asignados</span>
+                                {% endfor %}
+                            </div>
+                        </div>
+                        <div class="mb-0">
+                            <label class="form-label small text-muted">Estado:</label>
+                            <div>
+                                {% if object.usuario.is_active %}
+                                    <span class="badge bg-success">
+                                        <i class="bi bi-check-circle-fill me-1"></i>Activo
+                                    </span>
+                                {% else %}
+                                    <span class="badge bg-danger">
+                                        <i class="bi bi-x-circle-fill me-1"></i>Inactivo
+                                    </span>
+                                {% endif %}
+                            </div>
+                        </div>
+                    {% else %}
+                        <div class="text-center text-muted py-3">
+                            <i class="bi bi-person-x display-6"></i>
+                            <p class="mb-0 mt-2">Este alumno no tiene usuario asociado</p>
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+        {% endif %}
+    </div>
 </div>
-{% endif %}
+{% endblock %}
+
+{% block extra_css %}
+<style>
+.form-control:focus, .form-select:focus {
+    border-color: #86b7fe;
+    box-shadow: 0 0 0 0.25rem rgba(13, 110, 253, 0.25);
+}
+
+.input-group-text {
+    background-color: #f8f9fa;
+    border-right: none;
+}
+
+.input-group .form-control,
+.input-group .form-select {
+    border-left: none;
+}
+
+.input-group .form-control:focus,
+.input-group .form-select:focus {
+    border-left: 1px solid #86b7fe;
+}
+
+.card {
+    border: none;
+    border-radius: 0.75rem;
+}
+
+.card-header {
+    border-radius: 0.75rem 0.75rem 0 0 !important;
+    font-weight: 500;
+}
+
+.breadcrumb-item + .breadcrumb-item::before {
+    content: "›";
+}
+
+.form-label {
+    font-weight: 500;
+    color: #495057;
+}
+
+.gap-2 {
+    gap: 0.5rem !important;
+}
+
+.font-monospace {
+    font-family: 'Courier New', Courier, monospace;
+}
+</style>
 {% endblock %}

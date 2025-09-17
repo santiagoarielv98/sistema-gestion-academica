@@ -1,12 +1,5 @@
-"""
-Management command para crear grupos y permisos del sistema
-"""
-
 from django.core.management.base import BaseCommand
 from django.contrib.auth.models import Group, Permission
-from django.contrib.contenttypes.models import ContentType
-from gestion_academica.models import Usuario, Carrera, Materia, Alumno, Inscripcion
-
 
 class Command(BaseCommand):
     help = 'Crea los grupos y permisos necesarios para el sistema'
@@ -14,7 +7,6 @@ class Command(BaseCommand):
     def handle(self, *args, **options):
         self.stdout.write('Creando grupos y permisos...')
 
-        # Crear grupos
         grupos = [
             'Administradores',
             'Alumnos', 

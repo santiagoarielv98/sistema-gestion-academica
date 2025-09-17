@@ -3,67 +3,296 @@
 {% block title %}Inscripciones - Sistema Académico{% endblock %}
 
 {% block content %}
-<h1>Gestión de Inscripciones</h1>
+<!-- Header Section -->
+<div class="row mb-4">
+    <div class="col-md-8">
+        <div class="d-flex align-items-center mb-2">
+            <i class="bi bi-journal-text text-primary me-3" style="font-size: 2.5rem;"></i>
+            <div>
+                <h1 class="mb-1">Gestión de Inscripciones</h1>
+                <p class="text-muted mb-0">Administra las inscripciones de alumnos a materias</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4 text-md-end">
+        <a href="{% url 'inscripcion_create' %}" class="btn btn-primary btn-lg">
+            <i class="bi bi-plus-circle"></i>
+            Crear Nueva Inscripción
+        </a>
+    </div>
+</div>
 
-<p><a href="{% url 'gestion_academica:inscripcion_create' %}">Crear Nueva Inscripción</a></p>
+<!-- Stats Cards -->
+<div class="row mb-4">
+    <div class="col-md-3 mb-3">
+        <div class="card bg-primary text-white">
+            <div class="card-body">
+                <div class="d-flex align-items-center">
+                    <div class="flex-grow-1">
+                        <h6 class="card-title mb-0">Total Inscripciones</h6>
+                        <h4 class="mb-0">{{ inscripciones|length }}</h4>
+                    </div>
+                    <div class="ms-3">
+                        <i class="bi bi-journal-text" style="font-size: 2rem; opacity: 0.7;"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3 mb-3">
+        <div class="card bg-success text-white">
+            <div class="card-body">
+                <div class="d-flex align-items-center">
+                    <div class="flex-grow-1">
+                        <h6 class="card-title mb-0">Inscripciones Activas</h6>
+                        <h4 class="mb-0">{% for i in inscripciones %}{% if i.activa %}{{ forloop.counter }}{% endif %}{% endfor %}</h4>
+                    </div>
+                    <div class="ms-3">
+                        <i class="bi bi-check-circle" style="font-size: 2rem; opacity: 0.7;"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3 mb-3">
+        <div class="card bg-warning text-white">
+            <div class="card-body">
+                <div class="d-flex align-items-center">
+                    <div class="flex-grow-1">
+                        <h6 class="card-title mb-0">Dadas de Baja</h6>
+                        <h4 class="mb-0">{% for i in inscripciones %}{% if not i.activa %}{{ forloop.counter }}{% endif %}{% endfor %}</h4>
+                    </div>
+                    <div class="ms-3">
+                        <i class="bi bi-x-circle" style="font-size: 2rem; opacity: 0.7;"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3 mb-3">
+        <div class="card bg-info text-white">
+            <div class="card-body">
+                <div class="d-flex align-items-center">
+                    <div class="flex-grow-1">
+                        <h6 class="card-title mb-0">Este Mes</h6>
+                        <h4 class="mb-0">-</h4>
+                        <small class="opacity-75">Próximamente</small>
+                    </div>
+                    <div class="ms-3">
+                        <i class="bi bi-calendar-event" style="font-size: 2rem; opacity: 0.7;"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
 
-{% if inscripciones %}
-    <table border="1">
-        <thead>
-            <tr>
-                <th>Alumno</th>
-                <th>Materia</th>
-                <th>Carrera</th>
-                <th>Fecha Inscripción</th>
-                <th>Estado</th>
-                <th>Observaciones</th>
-                <th>Acciones</th>
-            </tr>
-        </thead>
-        <tbody>
-            {% for inscripcion in inscripciones %}
-            <tr>
-                <td>{{ inscripcion.alumno.nombre_completo }} ({{ inscripcion.alumno.legajo }})</td>
-                <td>{{ inscripcion.materia.nombre }} ({{ inscripcion.materia.codigo }})</td>
-                <td>{{ inscripcion.materia.carrera.nombre }}</td>
-                <td>{{ inscripcion.fecha_inscripcion|date:"d/m/Y H:i" }}</td>
-                <td>{% if inscripcion.activa %}Activa{% else %}Dada de Baja{% endif %}</td>
-                <td>{{ inscripcion.observaciones|default:"Sin observaciones" }}</td>
-                <td>
-                    {% if inscripcion.activa %}
-                        <form method="post" action="{% url 'gestion_academica:inscripcion_baja' inscripcion.pk %}" style="display: inline;">
-                            {% csrf_token %}
-                            <button type="submit" onclick="return confirm('¿Estás seguro de dar de baja esta inscripción?')">Dar de Baja</button>
-                        </form>
-                    {% else %}
-                        <span>Baja dada</span>
-                    {% endif %}
-                </td>
-            </tr>
-            {% endfor %}
-        </tbody>
-    </table>
-    
-    {% if is_paginated %}
-        <div>
-            <span>
-                {% if page_obj.has_previous %}
-                    <a href="?page=1">« primera</a>
-                    <a href="?page={{ page_obj.previous_page_number }}">anterior</a>
-                {% endif %}
-                
-                <span>
-                    Página {{ page_obj.number }} de {{ page_obj.paginator.num_pages }}
-                </span>
-                
-                {% if page_obj.has_next %}
-                    <a href="?page={{ page_obj.next_page_number }}">siguiente</a>
-                    <a href="?page={{ page_obj.paginator.num_pages }}">última »</a>
-                {% endif %}
-            </span>
+<!-- Inscripciones Content -->
+<div class="card">
+    {% if inscripciones %}
+        <div class="card-header bg-light">
+            <div class="row align-items-center">
+                <div class="col">
+                    <h5 class="mb-0">
+                        <i class="bi bi-table"></i>
+                        Lista de Inscripciones
+                    </h5>
+                    <small class="text-muted">Total: {{ inscripciones|length }} inscripciones registradas</small>
+                </div>
+                <div class="col-auto">
+                    <!-- Future: Add filters here -->
+                    <div class="btn-group btn-group-sm" role="group">
+                        <button type="button" class="btn btn-outline-secondary">
+                            <i class="bi bi-funnel"></i>
+                            Filtros
+                        </button>
+                        <button type="button" class="btn btn-outline-secondary">
+                            <i class="bi bi-download"></i>
+                            Exportar
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="card-body p-0">
+            <div class="table-responsive">
+                <table class="table table-hover table-striped mb-0">
+                    <thead class="table-dark">
+                        <tr>
+                            <th scope="col">
+                                <i class="bi bi-person-badge me-1"></i>
+                                Alumno
+                            </th>
+                            <th scope="col">
+                                <i class="bi bi-book me-1"></i>
+                                Materia
+                            </th>
+                            <th scope="col">
+                                <i class="bi bi-mortarboard me-1"></i>
+                                Carrera
+                            </th>
+                            <th scope="col">
+                                <i class="bi bi-calendar-event me-1"></i>
+                                Fecha Inscripción
+                            </th>
+                            <th scope="col">
+                                <i class="bi bi-check-circle me-1"></i>
+                                Estado
+                            </th>
+                            <th scope="col">
+                                <i class="bi bi-chat-dots me-1"></i>
+                                Observaciones
+                            </th>
+                            <th scope="col" width="120">
+                                <i class="bi bi-gear me-1"></i>
+                                Acciones
+                            </th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for inscripcion in inscripciones %}
+                        <tr>
+                            <td>
+                                <div class="d-flex align-items-center">
+                                    <i class="bi bi-person-circle text-secondary me-2"></i>
+                                    <div>
+                                        <div class="fw-semibold">{{ inscripcion.alumno.nombre_completo }}</div>
+                                        <small class="text-muted">
+                                            <span class="badge bg-secondary">{{ inscripcion.alumno.legajo }}</span>
+                                        </small>
+                                    </div>
+                                </div>
+                            </td>
+                            <td>
+                                <div>
+                                    <div class="fw-semibold">{{ inscripcion.materia.nombre }}</div>
+                                    <small class="text-muted">
+                                        <span class="badge bg-info">{{ inscripcion.materia.codigo }}</span>
+                                    </small>
+                                </div>
+                            </td>
+                            <td>
+                                <span class="badge bg-primary">
+                                    <i class="bi bi-mortarboard me-1"></i>
+                                    {{ inscripcion.materia.carrera.nombre }}
+                                </span>
+                            </td>
+                            <td>
+                                <div class="d-flex align-items-center">
+                                    <i class="bi bi-clock text-muted me-2"></i>
+                                    <div>
+                                        <div>{{ inscripcion.fecha_inscripcion|date:"d/m/Y" }}</div>
+                                        <small class="text-muted">{{ inscripcion.fecha_inscripcion|date:"H:i" }}</small>
+                                    </div>
+                                </div>
+                            </td>
+                            <td>
+                                {% if inscripcion.activa %}
+                                    <span class="badge bg-success">
+                                        <i class="bi bi-check-circle me-1"></i>
+                                        Activa
+                                    </span>
+                                {% else %}
+                                    <span class="badge bg-danger">
+                                        <i class="bi bi-x-circle me-1"></i>
+                                        Dada de Baja
+                                    </span>
+                                {% endif %}
+                            </td>
+                            <td>
+                                {% if inscripcion.observaciones %}
+                                    <span class="text-truncate d-inline-block" style="max-width: 150px;" title="{{ inscripcion.observaciones }}">
+                                        {{ inscripcion.observaciones }}
+                                    </span>
+                                {% else %}
+                                    <small class="text-muted">
+                                        <i class="bi bi-dash"></i>
+                                        Sin observaciones
+                                    </small>
+                                {% endif %}
+                            </td>
+                            <td>
+                                {% if inscripcion.activa %}
+                                    <form method="post" action="{% url 'inscripcion_baja' inscripcion.pk %}" class="d-inline">
+                                        {% csrf_token %}
+                                        <button type="submit" 
+                                                class="btn btn-sm btn-outline-danger" 
+                                                onclick="return confirm('¿Estás seguro de dar de baja esta inscripción?')"
+                                                title="Dar de baja inscripción">
+                                            <i class="bi bi-x-circle"></i>
+                                            Dar Baja
+                                        </button>
+                                    </form>
+                                {% else %}
+                                    <span class="badge bg-secondary">
+                                        <i class="bi bi-check2"></i>
+                                        Baja dada
+                                    </span>
+                                {% endif %}
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        
+        <!-- Pagination -->
+        {% if is_paginated %}
+            <div class="card-footer">
+                <nav aria-label="Paginación de inscripciones">
+                    <ul class="pagination pagination-sm justify-content-center mb-0">
+                        {% if page_obj.has_previous %}
+                            <li class="page-item">
+                                <a class="page-link" href="?page=1" aria-label="Primera página">
+                                    <i class="bi bi-chevron-double-left"></i>
+                                </a>
+                            </li>
+                            <li class="page-item">
+                                <a class="page-link" href="?page={{ page_obj.previous_page_number }}" aria-label="Página anterior">
+                                    <i class="bi bi-chevron-left"></i>
+                                </a>
+                            </li>
+                        {% endif %}
+                        
+                        <li class="page-item active">
+                            <span class="page-link">
+                                Página {{ page_obj.number }} de {{ page_obj.paginator.num_pages }}
+                            </span>
+                        </li>
+                        
+                        {% if page_obj.has_next %}
+                            <li class="page-item">
+                                <a class="page-link" href="?page={{ page_obj.next_page_number }}" aria-label="Página siguiente">
+                                    <i class="bi bi-chevron-right"></i>
+                                </a>
+                            </li>
+                            <li class="page-item">
+                                <a class="page-link" href="?page={{ page_obj.paginator.num_pages }}" aria-label="Última página">
+                                    <i class="bi bi-chevron-double-right"></i>
+                                </a>
+                            </li>
+                        {% endif %}
+                    </ul>
+                </nav>
+            </div>
+        {% endif %}
+    {% else %}
+        <div class="card-body text-center py-5">
+            <div class="mb-4">
+                <i class="bi bi-inbox text-muted" style="font-size: 4rem;"></i>
+            </div>
+            <h4 class="text-muted mb-3">No hay inscripciones registradas</h4>
+            <p class="text-muted mb-4">
+                No se encontraron inscripciones en el sistema. 
+                <br>Comienza creando la primera inscripción.
+            </p>
+            <a href="{% url 'inscripcion_create' %}" class="btn btn-primary">
+                <i class="bi bi-plus-circle me-1"></i>
+                Crear Primera Inscripción
+            </a>
         </div>
     {% endif %}
-{% else %}
-    <p>No hay inscripciones registradas en el sistema.</p>
-{% endif %}
+</div>
 {% endblock %}
