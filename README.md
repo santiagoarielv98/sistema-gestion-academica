@@ -24,8 +24,8 @@ Sistema web desarrollado en Django para la gestión académica de instituciones 
 
 ### 1. Clonar el repositorio
 ```bash
-git clone <url-del-repositorio>
-cd demo
+git clone https://github.com/santiagoarielv98/sistema-gestion-academica.git
+cd sistema-gestion-academica
 ```
 
 ### 2. Crear y activar entorno virtual
@@ -47,17 +47,22 @@ pip install -r requirements.txt
 python manage.py migrate
 ```
 
-### 5. Crear superusuario (administrador principal)
+### 5. (Opcional) Crear superusuario (administrador principal)
 ```bash
 python manage.py createsuperuser
 ```
 
-### 6. Cargar datos de ejemplo (opcional)
+### 6. Cargar Grupos y Permisos Iniciales (Obligatorio)
+```bash
+python manage.py crear_grupos
+```
+
+### 7. Cargar datos de ejemplo (Recomendado)
 ```bash
 python manage.py cargar_datos_iniciales
 ```
 
-### 7. Ejecutar el servidor
+### 8. Ejecutar el servidor
 ```bash
 python manage.py runserver
 ```
@@ -69,7 +74,7 @@ El sistema estará disponible en: http://127.0.0.1:8000/
 Después de ejecutar `cargar_datos_iniciales`:
 
 - **Administrador**: admin@crui.edu.ar / admin123
-- **Invitado**: invitado@ejemplo.com / 87654321
+- **Invitado**: invitado@ejemplo.com / 87654321 TODO: quitar grupo invitado, y permitir acceso sin login
 - **Alumnos**: usar email del alumno / contraseña: su DNI
 
 ## Estructura del Proyecto
