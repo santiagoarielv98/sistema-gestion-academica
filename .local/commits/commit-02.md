@@ -9,6 +9,8 @@ Crear la aplicación `usuario` que manejará el sistema de autenticación person
 
 #### 1. Crear la app usuario
 ```bash
+# Hacerlo desde la raíz del proyecto
+# DSW_P_Final
 python manage.py startapp usuario
 ```
 
