@@ -14,7 +14,7 @@ Crear la aplicación `usuario` que manejará el sistema de autenticación person
 python manage.py startapp usuario
 ```
 
-#### 2. Implementar modelo Usuario personalizado
+#### 2. Implementar modelo Usuario personalizado (Ver codigo abajo)
 - Crear clase `Usuario` que herede de `AbstractUser`
 - Configurar email como campo único y USERNAME_FIELD
 - Agregar campo `username` como DNI con validación de 8 dígitos
@@ -29,6 +29,7 @@ python manage.py startapp usuario
 ```bash
 python manage.py makemigrations usuario
 python manage.py migrate
+# Si lanza error, eliminar archivo db.sqlite3 y migrar de nuevo
 ```
 
 ### Archivos a crear/modificar
