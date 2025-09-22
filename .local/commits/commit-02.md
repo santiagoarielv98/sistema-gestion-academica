@@ -44,7 +44,6 @@ Modelo de usuario personalizado funcionando con email como login y DNI como user
 usuario/models.py
 ```python
 from django.db import models
-from django.db import models
 from django.contrib.auth.models import AbstractUser, Group
 from django.core.validators import RegexValidator
 
