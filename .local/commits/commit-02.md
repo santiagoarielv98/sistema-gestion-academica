@@ -37,6 +37,8 @@ python manage.py migrate
 ### Resultado esperado
 Modelo de usuario personalizado funcionando con email como login y DNI como username.
 
+
+### Código en
 usuario/models.py
 ```python
 from django.db import models
@@ -127,4 +129,36 @@ class Usuario(AbstractUser):
                 pass  # El grupo se creará con el comando crear_grupos
             
             return usuario
+```
+
+usuario/admin.py
+```python
+from django.contrib import admin
+
+from .models import Usuario
+
+class UsuarioAdmin(admin.ModelAdmin):
+    list_display = ('username', 'email', 'first_name', 'last_name', 'is_staff', 'is_active')
+    list_filter = ('is_staff', 'is_active', 'groups')
+    search_fields = ('username', 'email', 'first_name', 'last_name')
+    ordering = ('username',)
+
+admin.site.register(Usuario, UsuarioAdmin)
+```
+
+myapp/settings.py (Quitar comentarios)
+```python
+# ...
+INSTALLED_APPS = [
+    'django.contrib.admin',
+    'django.contrib.auth',
+    'django.contrib.contenttypes',
+    'django.contrib.sessions',
+    'django.contrib.messages',
+    'django.contrib.staticfiles',
+    'usuario', # Agregar la app usuario
+]
+# ...
+# Al final del archivo
+AUTH_USER_MODEL = 'usuario.Usuario'
 ```
